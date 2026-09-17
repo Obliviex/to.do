@@ -2,6 +2,8 @@
 
 A simple, clean to-do list app with a bright, terminal-inspired aesthetic. Built with React, TypeScript, Tailwind CSS, Zustand, and Dexie.js for local-first persistence.
 
+**Live Demo:** https://to-1sviwzn9q-obliviex.vercel.app
+
 ## Features
 
 - **Task Management**: Add, edit, complete, and delete tasks
