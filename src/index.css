@@ -12,4 +12,22 @@
   body {
     @apply bg-background text-text font-mono antialiased;
   }
+  
+  /* Custom scrollbar for dark theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-background-dark;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-card-light rounded;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-border;
+  }
 }

@@ -1,10 +1,9 @@
-import { Home, ListChecks, CheckCircle2, Plus, Menu, X } from 'lucide-react';
+import { Home, Timer, CheckCircle2, Menu, X } from 'lucide-react';
 import { useTodoStore } from '../store/store';
 import { useState } from 'react';
 
 export function Sidebar() {
   const { 
-    lists, 
     currentListId, 
     currentView, 
     setCurrentListId, 
@@ -15,8 +14,8 @@ export function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'lists', label: 'Lists', icon: ListChecks },
+    { id: 'timer', label: 'Timer', icon: Timer },
+    { id: 'home', label: 'Tasks', icon: Home },
     { id: 'completed', label: 'Completed', icon: CheckCircle2 },
   ];
 
@@ -76,39 +75,6 @@ export function Sidebar() {
               >
                 <Icon size={18} />
                 <span className="text-sm font-medium">{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Lists */}
-        <div>
-          <div className="flex items-center justify-between mb-3 px-3">
-            <p className="text-text-muted text-xs uppercase tracking-wider">Lists</p>
-            <button className="text-text-muted hover:text-accent transition-colors">
-              <Plus size={16} />
-            </button>
-          </div>
-          {lists.map((list) => {
-            const isActive = currentListId === list.id;
-            return (
-              <button
-                key={list.id}
-                onClick={() => {
-                  setCurrentView('lists');
-                  setCurrentListId(list.id!);
-                }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-colors ${
-                  isActive 
-                    ? 'bg-accent/10 text-accent' 
-                    : 'text-text-muted hover:bg-background hover:text-text'
-                }`}
-              >
-                <div 
-                  className="w-3 h-3 rounded-full" 
-                  style={{ backgroundColor: list.color }}
-                />
-                <span className="text-sm font-medium">{list.name}</span>
               </button>
             );
           })}

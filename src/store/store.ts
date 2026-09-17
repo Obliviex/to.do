@@ -6,7 +6,7 @@ interface TodoStore {
   tasks: Task[];
   lists: TaskList[];
   currentListId: number | null;
-  currentView: 'home' | 'lists' | 'completed';
+  currentView: 'timer' | 'home' | 'completed';
   searchQuery: string;
   sortBy: 'date' | 'name';
   streak: number;
@@ -21,7 +21,7 @@ interface TodoStore {
   addList: (name: string, color: string) => Promise<void>;
   deleteList: (id: number) => Promise<void>;
   setCurrentListId: (id: number | null) => void;
-  setCurrentView: (view: 'home' | 'lists' | 'completed') => void;
+  setCurrentView: (view: 'timer' | 'home' | 'completed') => void;
   setSearchQuery: (query: string) => void;
   setSortBy: (sort: 'date' | 'name') => void;
   calculateStreak: () => void;
@@ -126,7 +126,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   },
 
   setCurrentListId: (id: number | null) => set({ currentListId: id }),
-  setCurrentView: (view: 'home' | 'lists' | 'completed') => set({ currentView: view }),
+  setCurrentView: (view: 'timer' | 'home' | 'completed') => set({ currentView: view }),
   setSearchQuery: (query: string) => set({ searchQuery: query }),
   setSortBy: (sort: 'date' | 'name') => set({ sortBy: sort }),
 

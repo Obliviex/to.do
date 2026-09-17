@@ -6,7 +6,6 @@ export function TaskList() {
   const { 
     tasks, 
     lists, 
-    currentListId, 
     currentView, 
     searchQuery, 
     sortBy,
@@ -25,7 +24,6 @@ export function TaskList() {
   const filteredTasks = tasks
     .filter(task => {
       if (currentView === 'completed') return task.completed;
-      if (currentListId) return task.listId === currentListId && !task.completed;
       return !task.completed;
     })
     .filter(task => 
@@ -38,13 +36,11 @@ export function TaskList() {
       return a.title.localeCompare(b.title);
     });
 
-  const currentList = lists.find(l => l.id === currentListId);
-
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
     
-    const listId = currentListId || lists[0]?.id || 1;
+    const listId = lists[0]?.id || 1;
     await addTask(newTaskTitle, listId);
     setNewTaskTitle('');
   };
@@ -69,8 +65,7 @@ export function TaskList() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl lg:text-3xl font-bold text-text mb-2">
-          {currentView === 'home' && 'Home'}
-          {currentView === 'lists' && currentList?.name}
+          {currentView === 'home' && 'Tasks'}
           {currentView === 'completed' && 'Completed'}
         </h1>
         <p className="text-text-muted text-sm">
