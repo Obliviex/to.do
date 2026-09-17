@@ -12,7 +12,7 @@ export function PomodoroTimer() {
   const [mode, setMode] = useState<TimerMode>('pomodoro');
   const [timeLeft, setTimeLeft] = useState(TIMER_CONFIG.pomodoro);
   const [isRunning, setIsRunning] = useState(false);
-  const [sessionCount, setSessionCount] = useState(1);
+  const sessionCount = 1;
   const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
