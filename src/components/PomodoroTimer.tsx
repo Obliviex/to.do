@@ -59,24 +59,24 @@ export function PomodoroTimer() {
   const getModeColor = () => {
     switch (mode) {
       case 'pomodoro':
-        return 'text-accent';
+        return 'bg-accent';
       case 'shortBreak':
-        return 'text-turquoise';
+        return 'bg-turquoise';
       case 'longBreak':
-        return 'text-blue';
+        return 'bg-blue';
     }
   };
 
   return (
-    <div className="bg-card rounded-card p-8 max-w-md mx-auto">
+    <div className={`${getModeColor()} rounded-card p-8 max-w-md mx-auto`}>
       {/* Mode Tabs */}
       <div className="flex gap-2 mb-8">
         <button
           onClick={() => handleModeChange('pomodoro')}
           className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all ${
             mode === 'pomodoro'
-              ? 'bg-accent text-white'
-              : 'bg-background text-text-muted hover:bg-background-dark'
+              ? 'bg-white text-accent'
+              : 'bg-white/20 text-white hover:bg-white/30'
           }`}
         >
           Pomodoro
@@ -85,8 +85,8 @@ export function PomodoroTimer() {
           onClick={() => handleModeChange('shortBreak')}
           className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all ${
             mode === 'shortBreak'
-              ? 'bg-turquoise text-white'
-              : 'bg-background text-text-muted hover:bg-background-dark'
+              ? 'bg-white text-turquoise'
+              : 'bg-white/20 text-white hover:bg-white/30'
           }`}
         >
           5 min
@@ -95,8 +95,8 @@ export function PomodoroTimer() {
           onClick={() => handleModeChange('longBreak')}
           className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all ${
             mode === 'longBreak'
-              ? 'bg-blue text-white'
-              : 'bg-background text-text-muted hover:bg-background-dark'
+              ? 'bg-white text-blue'
+              : 'bg-white/20 text-white hover:bg-white/30'
           }`}
         >
           10 min break
@@ -105,10 +105,10 @@ export function PomodoroTimer() {
 
       {/* Timer Display */}
       <div className="text-center mb-8">
-        <div className={`text-8xl font-bold mb-4 font-mono ${getModeColor()}`}>
+        <div className="text-8xl font-bold mb-4 font-mono text-white">
           {formatTime(timeLeft)}
         </div>
-        <div className="text-text-muted text-sm">
+        <div className="text-white/80 text-sm">
           #{sessionCount} {mode === 'pomodoro' ? 'Time to focus!' : 'Time to take a break!'}
         </div>
       </div>
@@ -116,7 +116,7 @@ export function PomodoroTimer() {
       {/* Start/Pause Button */}
       <button
         onClick={handleStartPause}
-        className="w-full py-4 bg-white text-background-dark rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors mb-4"
+        className="w-full py-4 bg-white text-text rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors mb-4"
       >
         {isRunning ? 'PAUSE' : 'START'}
       </button>
@@ -124,7 +124,7 @@ export function PomodoroTimer() {
       {/* Reset Button */}
       <button
         onClick={handleReset}
-        className="w-full py-2 text-text-muted hover:text-text transition-colors text-sm"
+        className="w-full py-2 text-white/80 hover:text-white transition-colors text-sm"
       >
         Reset
       </button>
