@@ -5,7 +5,7 @@ type TimerMode = 'pomodoro' | 'shortBreak' | 'longBreak';
 const TIMER_CONFIG = {
   pomodoro: 25 * 60, // 25 minutes
   shortBreak: 5 * 60, // 5 minutes
-  longBreak: 15 * 60, // 15 minutes
+  longBreak: 10 * 60, // 10 minutes
 };
 
 export function PomodoroTimer() {
@@ -56,14 +56,14 @@ export function PomodoroTimer() {
     setIsRunning(false);
   };
 
-  const getModeLabel = () => {
+  const getModeColor = () => {
     switch (mode) {
       case 'pomodoro':
-        return 'Pomodoro';
+        return 'text-accent';
       case 'shortBreak':
-        return 'Short Break';
+        return 'text-turquoise';
       case 'longBreak':
-        return 'Long Break';
+        return 'text-blue';
     }
   };
 
@@ -71,24 +71,41 @@ export function PomodoroTimer() {
     <div className="bg-card rounded-card p-8 max-w-md mx-auto">
       {/* Mode Tabs */}
       <div className="flex gap-2 mb-8">
-        {(['pomodoro', 'shortBreak', 'longBreak'] as TimerMode[]).map((m) => (
-          <button
-            key={m}
-            onClick={() => handleModeChange(m)}
-            className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all ${
-              mode === m
-                ? 'bg-background-dark text-white'
-                : 'bg-background text-text-muted hover:bg-background-dark'
-            }`}
-          >
-            {getModeLabel()}
-          </button>
-        ))}
+        <button
+          onClick={() => handleModeChange('pomodoro')}
+          className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all ${
+            mode === 'pomodoro'
+              ? 'bg-accent text-white'
+              : 'bg-background text-text-muted hover:bg-background-dark'
+          }`}
+        >
+          Pomodoro
+        </button>
+        <button
+          onClick={() => handleModeChange('shortBreak')}
+          className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all ${
+            mode === 'shortBreak'
+              ? 'bg-turquoise text-white'
+              : 'bg-background text-text-muted hover:bg-background-dark'
+          }`}
+        >
+          5 min
+        </button>
+        <button
+          onClick={() => handleModeChange('longBreak')}
+          className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all ${
+            mode === 'longBreak'
+              ? 'bg-blue text-white'
+              : 'bg-background text-text-muted hover:bg-background-dark'
+          }`}
+        >
+          10 min break
+        </button>
       </div>
 
       {/* Timer Display */}
       <div className="text-center mb-8">
-        <div className="text-8xl font-bold text-white mb-4 font-mono">
+        <div className={`text-8xl font-bold mb-4 font-mono ${getModeColor()}`}>
           {formatTime(timeLeft)}
         </div>
         <div className="text-text-muted text-sm">
@@ -107,7 +124,7 @@ export function PomodoroTimer() {
       {/* Reset Button */}
       <button
         onClick={handleReset}
-        className="w-full py-2 text-text-muted hover:text-white transition-colors text-sm"
+        className="w-full py-2 text-text-muted hover:text-text transition-colors text-sm"
       >
         Reset
       </button>
