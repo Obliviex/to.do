@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTodoStore } from '../store/store';
 
 type TimerMode = 'pomodoro' | 'shortBreak' | 'longBreak';
 
@@ -9,15 +10,18 @@ const TIMER_CONFIG = {
 };
 
 export function PomodoroTimer() {
-  const [mode, setMode] = useState<TimerMode>('pomodoro');
+  const { timerMode, setTimerMode } = useTodoStore();
+  const [customMinutes, setCustomMinutes] = useState(25);
   const [timeLeft, setTimeLeft] = useState(TIMER_CONFIG.pomodoro);
   const [isRunning, setIsRunning] = useState(false);
+  const [useCustom, setUseCustom] = useState(false);
   const sessionCount = 1;
   const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
-    setTimeLeft(TIMER_CONFIG[mode]);
-  }, [mode]);
+    const duration = useCustom ? customMinutes * 60 : TIMER_CONFIG[timerMode];
+    setTimeLeft(duration);
+  }, [timerMode, useCustom, customMinutes]);
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
@@ -48,16 +52,28 @@ export function PomodoroTimer() {
 
   const handleReset = () => {
     setIsRunning(false);
-    setTimeLeft(TIMER_CONFIG[mode]);
+    const duration = useCustom ? customMinutes * 60 : TIMER_CONFIG[timerMode];
+    setTimeLeft(duration);
   };
 
   const handleModeChange = (newMode: TimerMode) => {
-    setMode(newMode);
+    setTimerMode(newMode);
     setIsRunning(false);
+    setUseCustom(false);
+  };
+
+  const handleCustomTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (value > 0 && value <= 120) {
+      setCustomMinutes(value);
+      setUseCustom(true);
+      setIsRunning(false);
+      setTimeLeft(value * 60);
+    }
   };
 
   const getModeColor = () => {
-    switch (mode) {
+    switch (timerMode) {
       case 'pomodoro':
         return 'bg-accent';
       case 'shortBreak':
@@ -74,7 +90,7 @@ export function PomodoroTimer() {
         <button
           onClick={() => handleModeChange('pomodoro')}
           className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all ${
-            mode === 'pomodoro'
+            timerMode === 'pomodoro'
               ? 'bg-white text-accent'
               : 'bg-white/20 text-white hover:bg-white/30'
           }`}
@@ -84,7 +100,7 @@ export function PomodoroTimer() {
         <button
           onClick={() => handleModeChange('shortBreak')}
           className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all ${
-            mode === 'shortBreak'
+            timerMode === 'shortBreak'
               ? 'bg-white text-turquoise'
               : 'bg-white/20 text-white hover:bg-white/30'
           }`}
@@ -94,7 +110,7 @@ export function PomodoroTimer() {
         <button
           onClick={() => handleModeChange('longBreak')}
           className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all ${
-            mode === 'longBreak'
+            timerMode === 'longBreak'
               ? 'bg-white text-blue'
               : 'bg-white/20 text-white hover:bg-white/30'
           }`}
@@ -103,13 +119,27 @@ export function PomodoroTimer() {
         </button>
       </div>
 
+      {/* Custom Time Input */}
+      <div className="mb-6">
+        <label className="text-white/80 text-sm mb-2 block">Custom duration (minutes):</label>
+        <input
+          type="number"
+          min="1"
+          max="120"
+          value={customMinutes}
+          onChange={handleCustomTimeChange}
+          className="w-full px-4 py-2 bg-white/20 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-white/50"
+          placeholder="Enter minutes"
+        />
+      </div>
+
       {/* Timer Display */}
       <div className="text-center mb-8">
         <div className="text-8xl font-bold mb-4 font-mono text-white">
           {formatTime(timeLeft)}
         </div>
         <div className="text-white/80 text-sm">
-          #{sessionCount} {mode === 'pomodoro' ? 'Time to focus!' : 'Time to take a break!'}
+          #{sessionCount} {timerMode === 'pomodoro' ? 'Time to focus!' : 'Time to take a break!'}
         </div>
       </div>
 

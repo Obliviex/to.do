@@ -11,6 +11,7 @@ interface TodoStore {
   sortBy: 'date' | 'name';
   streak: number;
   lastCompletedDate: Date | null;
+  timerMode: 'pomodoro' | 'shortBreak' | 'longBreak';
   
   loadTasks: () => Promise<void>;
   loadLists: () => Promise<void>;
@@ -24,6 +25,7 @@ interface TodoStore {
   setCurrentView: (view: 'timer' | 'home' | 'completed') => void;
   setSearchQuery: (query: string) => void;
   setSortBy: (sort: 'date' | 'name') => void;
+  setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => void;
   calculateStreak: () => void;
 }
 
@@ -36,6 +38,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   sortBy: 'date',
   streak: 0,
   lastCompletedDate: null,
+  timerMode: 'pomodoro',
 
   loadTasks: async () => {
     const tasks = await db.tasks.toArray();
@@ -129,6 +132,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   setCurrentView: (view: 'timer' | 'home' | 'completed') => set({ currentView: view }),
   setSearchQuery: (query: string) => set({ searchQuery: query }),
   setSortBy: (sort: 'date' | 'name') => set({ sortBy: sort }),
+  setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => set({ timerMode: mode }),
 
   calculateStreak: () => {
     const { tasks, lastCompletedDate } = get();
