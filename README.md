@@ -1,12 +1,18 @@
 # to.do
 
-A simple, clean to-do list app with a bright, terminal-inspired aesthetic. Built with React, TypeScript, Tailwind CSS, Zustand, and Dexie.js for local-first persistence.
+A modern, minimalist todo application with Pomodoro timer integration.
 
 **Live Demo:** https://to-1sviwzn9q-obliviex.vercel.app
 
 ## Features
 
-- **Task Management**: Add, edit, complete, and delete tasks
+- Task management with add, edit, delete, and complete functionality
+- Pomodoro timer with customizable duration
+- Multiple timer modes: Pomodoro (25 min), Short Break (5 min), Long Break (10 min)
+- Custom timer duration input (1-120 minutes)
+- Dynamic background colors based on timer mode
+- Task statistics and streak tracking
+- Responsive design with mobile support
 - **List Organization**: Group tasks into custom lists/projects
 - **Streak Tracking**: Track consecutive days with completed tasks
 - **Progress Stats**: Visual chart showing task completion over the last 7 days
