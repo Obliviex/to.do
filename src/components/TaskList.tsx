@@ -279,7 +279,7 @@ export function TaskList() {
           filteredTasks.map((task) => (
             <div
               key={task.id}
-              className={`bg-card border border-border rounded-card p-4 flex items-start gap-4 transition-all ${
+              className={`bg-card border border-border rounded-card p-4 flex items-start gap-4 transition-all relative ${
                 task.completed ? 'opacity-60' : ''
               }`}
             >
@@ -293,6 +293,28 @@ export function TaskList() {
               >
                 {task.completed && <Check size={14} />}
               </button>
+
+              {/* Time and Due Date Controls */}
+              <div className="flex gap-2 items-center mt-0.5">
+                <input
+                  type="time"
+                  value={task.startTime || ''}
+                  onChange={(e) => updateTask(task.id!, { startTime: e.target.value })}
+                  className="px-2 py-1 bg-background border border-border rounded text-xs text-text focus:outline-none focus:border-accent"
+                />
+                <input
+                  type="time"
+                  value={task.endTime || ''}
+                  onChange={(e) => updateTask(task.id!, { endTime: e.target.value })}
+                  className="px-2 py-1 bg-background border border-border rounded text-xs text-text focus:outline-none focus:border-accent"
+                />
+                <input
+                  type="date"
+                  value={task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : ''}
+                  onChange={(e) => updateTask(task.id!, { dueDate: e.target.value ? new Date(e.target.value) : undefined })}
+                  className="px-2 py-1 bg-background border border-border rounded text-xs text-text focus:outline-none focus:border-accent"
+                />
+              </div>
 
               {editingId === task.id ? (
                 <div className="flex-1 flex gap-2">
@@ -336,16 +358,6 @@ export function TaskList() {
                         ))}
                       </div>
                     )}
-                    {task.startTime && task.endTime && (
-                      <span className="text-xs text-text-muted">
-                        {task.startTime} - {task.endTime}
-                      </span>
-                    )}
-                    {task.dueDate && (
-                      <span className="text-xs text-text-muted">
-                        Due: {new Date(task.dueDate).toLocaleDateString()}
-                      </span>
-                    )}
                     {task.durationOption && task.durationOption !== 'none' && (
                       <span className="text-xs text-accent">
                         {task.durationOption === 'allDay' ? 'All Day' : task.durationOption === 'allWeek' ? 'All Week' : 'All Month'}
@@ -371,18 +383,18 @@ export function TaskList() {
                   </button>
                 </div>
               )}
+
+              {/* Plus button at bottom middle of task box */}
+              <button
+                onClick={() => setShowTagModal(true)}
+                className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 bg-accent/20 text-accent rounded-full hover:bg-accent/30 transition-all flex items-center justify-center"
+              >
+                <Plus size={14} />
+              </button>
             </div>
           ))
         )}
       </div>
-
-      {/* Floating Plus Button for Subcategories */}
-      <button
-        onClick={() => setShowTagModal(true)}
-        className="fixed bottom-8 left-1/2 -translate-x-1/2 w-14 h-14 bg-accent text-white rounded-full shadow-lg hover:bg-accent-hover transition-all flex items-center justify-center z-50"
-      >
-        <Plus size={24} />
-      </button>
 
       {/* Tag Modal */}
       {showTagModal && (
