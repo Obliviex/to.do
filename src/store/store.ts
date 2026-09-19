@@ -15,7 +15,7 @@ interface TodoStore {
   
   loadTasks: () => Promise<void>;
   loadLists: () => Promise<void>;
-  addTask: (title: string, listId: number, isFun?: boolean) => Promise<void>;
+  addTask: (title: string, listId: number, isFun?: boolean, tags?: string[], startTime?: string, endTime?: string, dueDate?: Date, durationOption?: 'none' | 'allDay' | 'allWeek' | 'allMonth') => Promise<void>;
   updateTask: (id: number, updates: Partial<Task>) => Promise<void>;
   deleteTask: (id: number) => Promise<void>;
   toggleTaskComplete: (id: number) => Promise<void>;
@@ -59,13 +59,18 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
     set({ lists });
   },
 
-  addTask: async (title: string, listId: number, isFun = false) => {
+  addTask: async (title: string, listId: number, isFun = false, tags?: string[], startTime?: string, endTime?: string, dueDate?: Date, durationOption?: 'none' | 'allDay' | 'allWeek' | 'allMonth') => {
     const task = {
       title,
       completed: false,
       listId,
       createdAt: new Date(),
-      isFun
+      isFun,
+      tags,
+      startTime,
+      endTime,
+      dueDate,
+      durationOption
     };
     const id = await db.tasks.add(task);
     set(state => ({ tasks: [...state.tasks, { ...task, id }] }));

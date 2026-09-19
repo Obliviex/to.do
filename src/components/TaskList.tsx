@@ -21,12 +21,21 @@ export function TaskList() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [isFunTask, setIsFunTask] = useState(false);
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [durationOption, setDurationOption] = useState<'none' | 'allDay' | 'allWeek' | 'allMonth'>('none');
+  const [showTagModal, setShowTagModal] = useState(false);
+  const [allTags, setAllTags] = useState<string[]>([]);
 
   const filteredTasks = tasks
     .filter(task => {
       if (currentView === 'completed') return task.completed;
       if (currentView === 'fun') return task.isFun && !task.completed;
-      return !task.completed;
+      return !task.isFun && !task.completed;
     })
     .filter(task => 
       task.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -43,9 +52,37 @@ export function TaskList() {
     if (!newTaskTitle.trim()) return;
     
     const listId = lists[0]?.id || 1;
-    await addTask(newTaskTitle, listId, currentView === 'fun' ? true : isFunTask);
+    const parsedDueDate = dueDate ? new Date(dueDate) : undefined;
+    await addTask(
+      newTaskTitle, 
+      listId, 
+      currentView === 'fun' ? true : isFunTask,
+      tags.length > 0 ? tags : undefined,
+      startTime || undefined,
+      endTime || undefined,
+      parsedDueDate,
+      durationOption !== 'none' ? durationOption : undefined
+    );
     setNewTaskTitle('');
     setIsFunTask(false);
+    setTags([]);
+    setTagInput('');
+    setStartTime('');
+    setEndTime('');
+    setDueDate('');
+    setDurationOption('none');
+    setShowAdvancedOptions(false);
+  };
+
+  const handleAddTag = () => {
+    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
+      setTags([...tags, tagInput.trim()]);
+      setTagInput('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
   const handleEditStart = (task: any) => {
@@ -64,7 +101,7 @@ export function TaskList() {
   };
 
   return (
-    <div className="flex-1 p-4 lg:p-6 pt-16 lg:pt-6">
+    <div className="flex-1 p-4 lg:p-6 pt-16 lg:pt-6 relative">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl lg:text-3xl font-bold text-text mb-2">
@@ -122,6 +159,13 @@ export function TaskList() {
                 </label>
               )}
               <button
+                type="button"
+                onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+                className="px-4 py-3 bg-card border border-border rounded-lg text-text-muted hover:text-text hover:border-accent transition-colors flex items-center gap-2 justify-center"
+              >
+                <span className="text-sm">Options</span>
+              </button>
+              <button
                 type="submit"
                 className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors flex items-center gap-2 font-medium justify-center"
               >
@@ -130,6 +174,96 @@ export function TaskList() {
               </button>
             </div>
           </div>
+
+          {/* Advanced Options */}
+          {showAdvancedOptions && (
+            <div className="mt-4 p-4 bg-card border border-border rounded-lg space-y-4">
+              {/* Tags */}
+              <div>
+                <label className="text-sm text-text-muted mb-2 block">Tags (subcategories)</label>
+                <div className="flex gap-2 flex-wrap mb-2">
+                  {tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm flex items-center gap-2"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTag(tag)}
+                        className="hover:text-accent-hover"
+                      >
+                        <X size={14} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Add a tag..."
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                    className="flex-1 px-3 py-2 bg-background border border-border rounded text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddTag}
+                    className="px-4 py-2 bg-accent text-white rounded hover:bg-accent-hover transition-colors text-sm"
+                  >
+                    Add Tag
+                  </button>
+                </div>
+              </div>
+
+              {/* Time Range */}
+              <div>
+                <label className="text-sm text-text-muted mb-2 block">Time Range</label>
+                <div className="flex gap-2">
+                  <input
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    className="flex-1 px-3 py-2 bg-background border border-border rounded text-sm text-text focus:outline-none focus:border-accent"
+                  />
+                  <span className="text-text-muted self-center">to</span>
+                  <input
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className="flex-1 px-3 py-2 bg-background border border-border rounded text-sm text-text focus:outline-none focus:border-accent"
+                  />
+                </div>
+              </div>
+
+              {/* Due Date */}
+              <div>
+                <label className="text-sm text-text-muted mb-2 block">Due Date</label>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className="w-full px-3 py-2 bg-background border border-border rounded text-sm text-text focus:outline-none focus:border-accent"
+                />
+              </div>
+
+              {/* Duration Option */}
+              <div>
+                <label className="text-sm text-text-muted mb-2 block">Duration</label>
+                <select
+                  value={durationOption}
+                  onChange={(e) => setDurationOption(e.target.value as any)}
+                  className="w-full px-3 py-2 bg-background border border-border rounded text-sm text-text focus:outline-none focus:border-accent"
+                >
+                  <option value="none">None</option>
+                  <option value="allDay">All Day</option>
+                  <option value="allWeek">All Week</option>
+                  <option value="allMonth">All Month</option>
+                </select>
+              </div>
+            </div>
+          )}
         </form>
       )}
 
@@ -145,13 +279,13 @@ export function TaskList() {
           filteredTasks.map((task) => (
             <div
               key={task.id}
-              className={`bg-card border border-border rounded-card p-4 flex items-center gap-4 transition-all ${
+              className={`bg-card border border-border rounded-card p-4 flex items-start gap-4 transition-all ${
                 task.completed ? 'opacity-60' : ''
               }`}
             >
               <button
                 onClick={() => toggleTaskComplete(task.id!)}
-                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
+                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors mt-0.5 ${
                   task.completed 
                     ? 'bg-accent border-accent text-white' 
                     : 'border-border hover:border-accent'
@@ -183,30 +317,123 @@ export function TaskList() {
                   </button>
                 </div>
               ) : (
-                <>
-                  <span className={`flex-1 text-sm ${task.completed ? 'line-through text-text-muted' : 'text-text'}`}>
+                <div className="flex-1">
+                  <span className={`text-sm block ${task.completed ? 'line-through text-text-muted' : 'text-text'}`}>
                     {task.title}
                   </span>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEditStart(task)}
-                      className="p-2 text-text-muted hover:text-text hover:bg-background rounded transition-colors"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      onClick={() => deleteTask(task.id!)}
-                      className="p-2 text-text-muted hover:text-red-500 hover:bg-background rounded transition-colors"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                  
+                  {/* Task Details */}
+                  <div className="mt-2 flex flex-wrap gap-2 items-center">
+                    {task.tags && task.tags.length > 0 && (
+                      <div className="flex gap-1 flex-wrap">
+                        {task.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-2 py-0.5 bg-accent/10 text-accent rounded-full text-xs"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {task.startTime && task.endTime && (
+                      <span className="text-xs text-text-muted">
+                        {task.startTime} - {task.endTime}
+                      </span>
+                    )}
+                    {task.dueDate && (
+                      <span className="text-xs text-text-muted">
+                        Due: {new Date(task.dueDate).toLocaleDateString()}
+                      </span>
+                    )}
+                    {task.durationOption && task.durationOption !== 'none' && (
+                      <span className="text-xs text-accent">
+                        {task.durationOption === 'allDay' ? 'All Day' : task.durationOption === 'allWeek' ? 'All Week' : 'All Month'}
+                      </span>
+                    )}
                   </div>
-                </>
+                </div>
+              )}
+
+              {editingId !== task.id && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEditStart(task)}
+                    className="p-2 text-text-muted hover:text-text hover:bg-background rounded transition-colors"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    onClick={() => deleteTask(task.id!)}
+                    className="p-2 text-text-muted hover:text-red-500 hover:bg-background rounded transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               )}
             </div>
           ))
         )}
       </div>
+
+      {/* Floating Plus Button for Subcategories */}
+      <button
+        onClick={() => setShowTagModal(true)}
+        className="fixed bottom-8 left-1/2 -translate-x-1/2 w-14 h-14 bg-accent text-white rounded-full shadow-lg hover:bg-accent-hover transition-all flex items-center justify-center z-50"
+      >
+        <Plus size={24} />
+      </button>
+
+      {/* Tag Modal */}
+      {showTagModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-card rounded-card p-6 max-w-md w-full">
+            <h2 className="text-xl font-bold text-text mb-4">Manage Tags</h2>
+            <div className="space-y-3 mb-4">
+              {allTags.map((tag) => (
+                <div
+                  key={tag}
+                  className="flex items-center justify-between p-3 bg-background rounded-lg"
+                >
+                  <span className="text-text">{tag}</span>
+                  <button
+                    onClick={() => setAllTags(allTags.filter(t => t !== tag))}
+                    className="text-text-muted hover:text-red-500"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="New tag name..."
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                className="flex-1 px-3 py-2 bg-background border border-border rounded text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent"
+              />
+              <button
+                onClick={() => {
+                  if (tagInput.trim() && !allTags.includes(tagInput.trim())) {
+                    setAllTags([...allTags, tagInput.trim()]);
+                    setTagInput('');
+                  }
+                }}
+                className="px-4 py-2 bg-accent text-white rounded hover:bg-accent-hover transition-colors"
+              >
+                Add
+              </button>
+            </div>
+            <button
+              onClick={() => setShowTagModal(false)}
+              className="w-full mt-4 px-4 py-2 bg-background border border-border rounded text-text hover:border-accent transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
