@@ -1,4 +1,4 @@
-import { Home, Timer, CheckCircle2, Menu, X } from 'lucide-react';
+import { Home, Timer, CheckCircle2, Menu, X, Sparkles } from 'lucide-react';
 import { useTodoStore } from '../store/store';
 import { useState } from 'react';
 
@@ -16,6 +16,7 @@ export function Sidebar() {
   const navItems = [
     { id: 'timer', label: 'Timer', icon: Timer },
     { id: 'home', label: 'Tasks', icon: Home },
+    { id: 'fun', label: 'Fun', icon: Sparkles },
     { id: 'completed', label: 'Completed', icon: CheckCircle2 },
   ];
 

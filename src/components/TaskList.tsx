@@ -20,10 +20,12 @@ export function TaskList() {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  const [isFunTask, setIsFunTask] = useState(false);
 
   const filteredTasks = tasks
     .filter(task => {
       if (currentView === 'completed') return task.completed;
+      if (currentView === 'fun') return task.isFun && !task.completed;
       return !task.completed;
     })
     .filter(task => 
@@ -41,8 +43,9 @@ export function TaskList() {
     if (!newTaskTitle.trim()) return;
     
     const listId = lists[0]?.id || 1;
-    await addTask(newTaskTitle, listId);
+    await addTask(newTaskTitle, listId, currentView === 'fun' ? true : isFunTask);
     setNewTaskTitle('');
+    setIsFunTask(false);
   };
 
   const handleEditStart = (task: any) => {
@@ -66,6 +69,7 @@ export function TaskList() {
       <div className="mb-6">
         <h1 className="text-2xl lg:text-3xl font-bold text-text mb-2">
           {currentView === 'home' && 'Tasks'}
+          {currentView === 'fun' && 'Fun Tasks'}
           {currentView === 'completed' && 'Completed'}
         </h1>
         <p className="text-text-muted text-sm">
@@ -100,18 +104,31 @@ export function TaskList() {
           <div className="flex gap-3 flex-col sm:flex-row">
             <input
               type="text"
-              placeholder="Add a new task..."
+              placeholder={currentView === 'fun' ? "Add a fun activity..." : "Add a new task..."}
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               className="flex-1 px-4 py-3 bg-card border border-border rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent"
             />
-            <button
-              type="submit"
-              className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors flex items-center gap-2 font-medium justify-center"
-            >
-              <Plus size={18} />
-              <span>Add</span>
-            </button>
+            <div className="flex gap-2">
+              {currentView === 'home' && (
+                <label className="flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-lg cursor-pointer hover:border-accent transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={isFunTask}
+                    onChange={(e) => setIsFunTask(e.target.checked)}
+                    className="w-4 h-4 accent-accent"
+                  />
+                  <span className="text-sm text-text">Fun</span>
+                </label>
+              )}
+              <button
+                type="submit"
+                className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors flex items-center gap-2 font-medium justify-center"
+              >
+                <Plus size={18} />
+                <span>Add</span>
+              </button>
+            </div>
           </div>
         </form>
       )}
@@ -121,7 +138,7 @@ export function TaskList() {
         {filteredTasks.length === 0 ? (
           <div className="bg-card border border-border rounded-card p-8 text-center">
             <p className="text-text-muted text-sm">
-              {currentView === 'completed' ? 'No completed tasks yet' : 'No tasks yet. Add one above!'}
+              {currentView === 'completed' ? 'No completed tasks yet' : currentView === 'fun' ? 'No fun activities yet. Add one above!' : 'No tasks yet. Add one above!'}
             </p>
           </div>
         ) : (

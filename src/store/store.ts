@@ -6,7 +6,7 @@ interface TodoStore {
   tasks: Task[];
   lists: TaskList[];
   currentListId: number | null;
-  currentView: 'timer' | 'home' | 'completed';
+  currentView: 'timer' | 'home' | 'completed' | 'fun';
   searchQuery: string;
   sortBy: 'date' | 'name';
   streak: number;
@@ -15,14 +15,14 @@ interface TodoStore {
   
   loadTasks: () => Promise<void>;
   loadLists: () => Promise<void>;
-  addTask: (title: string, listId: number) => Promise<void>;
+  addTask: (title: string, listId: number, isFun?: boolean) => Promise<void>;
   updateTask: (id: number, updates: Partial<Task>) => Promise<void>;
   deleteTask: (id: number) => Promise<void>;
   toggleTaskComplete: (id: number) => Promise<void>;
   addList: (name: string, color: string) => Promise<void>;
   deleteList: (id: number) => Promise<void>;
   setCurrentListId: (id: number | null) => void;
-  setCurrentView: (view: 'timer' | 'home' | 'completed') => void;
+  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun') => void;
   setSearchQuery: (query: string) => void;
   setSortBy: (sort: 'date' | 'name') => void;
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => void;
@@ -59,12 +59,13 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
     set({ lists });
   },
 
-  addTask: async (title: string, listId: number) => {
+  addTask: async (title: string, listId: number, isFun = false) => {
     const task = {
       title,
       completed: false,
       listId,
-      createdAt: new Date()
+      createdAt: new Date(),
+      isFun
     };
     const id = await db.tasks.add(task);
     set(state => ({ tasks: [...state.tasks, { ...task, id }] }));
@@ -129,7 +130,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   },
 
   setCurrentListId: (id: number | null) => set({ currentListId: id }),
-  setCurrentView: (view: 'timer' | 'home' | 'completed') => set({ currentView: view }),
+  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun') => set({ currentView: view }),
   setSearchQuery: (query: string) => set({ searchQuery: query }),
   setSortBy: (sort: 'date' | 'name') => set({ sortBy: sort }),
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => set({ timerMode: mode }),
