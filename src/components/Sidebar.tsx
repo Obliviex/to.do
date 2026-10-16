@@ -1,4 +1,4 @@
-import { Home, Timer, CheckCircle2, Menu, X, Sparkles, ShoppingCart } from 'lucide-react';
+import { Home, Timer, CheckCircle2, Menu, X, Sparkles, ShoppingCart, Flame } from 'lucide-react';
 import { useTodoStore } from '../store/store';
 import { useState } from 'react';
 
@@ -46,7 +46,7 @@ export function Sidebar() {
       <div className="bg-background border border-border rounded-card p-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
-            <span className="text-accent text-lg font-bold">🔥</span>
+            <Flame size={20} className="text-accent" />
           </div>
           <div>
             <p className="text-text-muted text-xs uppercase tracking-wider">Streak</p>
