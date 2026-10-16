@@ -6,7 +6,7 @@ interface TodoStore {
   tasks: Task[];
   lists: TaskList[];
   currentListId: number | null;
-  currentView: 'timer' | 'home' | 'completed' | 'fun';
+  currentView: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy';
   searchQuery: string;
   sortBy: 'date' | 'name';
   streak: number;
@@ -15,14 +15,14 @@ interface TodoStore {
   
   loadTasks: () => Promise<void>;
   loadLists: () => Promise<void>;
-  addTask: (title: string, listId: number, isFun?: boolean, tags?: string[], startTime?: string, endTime?: string, dueDate?: Date, durationOption?: 'none' | 'allDay' | 'allWeek' | 'allMonth') => Promise<void>;
+  addTask: (title: string, listId: number, isFun?: boolean, isWantToBuy?: boolean, parentTaskId?: number, startTime?: string, endTime?: string, dueDate?: Date, durationOption?: 'none' | 'allDay' | 'allWeek' | 'allMonth') => Promise<void>;
   updateTask: (id: number, updates: Partial<Task>) => Promise<void>;
   deleteTask: (id: number) => Promise<void>;
   toggleTaskComplete: (id: number) => Promise<void>;
   addList: (name: string, color: string) => Promise<void>;
   deleteList: (id: number) => Promise<void>;
   setCurrentListId: (id: number | null) => void;
-  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun') => void;
+  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy') => void;
   setSearchQuery: (query: string) => void;
   setSortBy: (sort: 'date' | 'name') => void;
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => void;
@@ -59,14 +59,15 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
     set({ lists });
   },
 
-  addTask: async (title: string, listId: number, isFun = false, tags?: string[], startTime?: string, endTime?: string, dueDate?: Date, durationOption?: 'none' | 'allDay' | 'allWeek' | 'allMonth') => {
+  addTask: async (title: string, listId: number, isFun = false, isWantToBuy = false, parentTaskId?: number, startTime?: string, endTime?: string, dueDate?: Date, durationOption?: 'none' | 'allDay' | 'allWeek' | 'allMonth') => {
     const task = {
       title,
       completed: false,
       listId,
       createdAt: new Date(),
       isFun,
-      tags,
+      isWantToBuy,
+      parentTaskId,
       startTime,
       endTime,
       dueDate,
@@ -135,7 +136,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   },
 
   setCurrentListId: (id: number | null) => set({ currentListId: id }),
-  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun') => set({ currentView: view }),
+  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy') => set({ currentView: view }),
   setSearchQuery: (query: string) => set({ searchQuery: query }),
   setSortBy: (sort: 'date' | 'name') => set({ sortBy: sort }),
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => set({ timerMode: mode }),

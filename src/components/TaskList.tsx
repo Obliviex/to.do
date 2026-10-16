@@ -21,21 +21,21 @@ export function TaskList() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [isFunTask, setIsFunTask] = useState(false);
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
+  const [isWantToBuyTask, setIsWantToBuyTask] = useState(false);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [durationOption, setDurationOption] = useState<'none' | 'allDay' | 'allWeek' | 'allMonth'>('none');
-  const [showTagModal, setShowTagModal] = useState(false);
-  const [allTags, setAllTags] = useState<string[]>([]);
+  const [showSubcategoryModal, setShowSubcategoryModal] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
+  const [subcategoryTitle, setSubcategoryTitle] = useState('');
 
   const filteredTasks = tasks
     .filter(task => {
       if (currentView === 'completed') return task.completed;
       if (currentView === 'fun') return task.isFun && !task.completed;
-      return !task.isFun && !task.completed;
+      if (currentView === 'wantToBuy') return task.isWantToBuy && !task.completed;
+      return !task.isFun && !task.isWantToBuy && !task.completed && !task.parentTaskId;
     })
     .filter(task => 
       task.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -57,7 +57,8 @@ export function TaskList() {
       newTaskTitle, 
       listId, 
       currentView === 'fun' ? true : isFunTask,
-      tags.length > 0 ? tags : undefined,
+      currentView === 'wantToBuy' ? true : isWantToBuyTask,
+      undefined,
       startTime || undefined,
       endTime || undefined,
       parsedDueDate,
@@ -65,24 +66,20 @@ export function TaskList() {
     );
     setNewTaskTitle('');
     setIsFunTask(false);
-    setTags([]);
-    setTagInput('');
+    setIsWantToBuyTask(false);
     setStartTime('');
     setEndTime('');
     setDueDate('');
     setDurationOption('none');
-    setShowAdvancedOptions(false);
   };
 
-  const handleAddTag = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
-      setTagInput('');
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+  const handleAddSubcategory = async () => {
+    if (!subcategoryTitle.trim() || !selectedTaskId) return;
+    const listId = lists[0]?.id || 1;
+    await addTask(subcategoryTitle, listId, false, false, selectedTaskId);
+    setSubcategoryTitle('');
+    setShowSubcategoryModal(false);
+    setSelectedTaskId(null);
   };
 
   const handleEditStart = (task: any) => {
@@ -107,6 +104,7 @@ export function TaskList() {
         <h1 className="text-2xl lg:text-3xl font-bold text-text mb-2">
           {currentView === 'home' && 'Tasks'}
           {currentView === 'fun' && 'Fun Tasks'}
+          {currentView === 'wantToBuy' && 'Want to Buy'}
           {currentView === 'completed' && 'Completed'}
         </h1>
         <p className="text-text-muted text-sm">
@@ -141,7 +139,7 @@ export function TaskList() {
           <div className="flex gap-3 flex-col sm:flex-row">
             <input
               type="text"
-              placeholder={currentView === 'fun' ? "Add a fun activity..." : "Add a new task..."}
+              placeholder={currentView === 'fun' ? "Add a fun activity..." : currentView === 'wantToBuy' ? "Add something to buy..." : "Add a new task..."}
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               className="flex-1 px-4 py-3 bg-card border border-border rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent"
@@ -158,13 +156,17 @@ export function TaskList() {
                   <span className="text-sm text-text">Fun</span>
                 </label>
               )}
-              <button
-                type="button"
-                onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
-                className="px-4 py-3 bg-card border border-border rounded-lg text-text-muted hover:text-text hover:border-accent transition-colors flex items-center gap-2 justify-center"
-              >
-                <span className="text-sm">Options</span>
-              </button>
+              {currentView === 'home' && (
+                <label className="flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-lg cursor-pointer hover:border-accent transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={isWantToBuyTask}
+                    onChange={(e) => setIsWantToBuyTask(e.target.checked)}
+                    className="w-4 h-4 accent-accent"
+                  />
+                  <span className="text-sm text-text">Want to Buy</span>
+                </label>
+              )}
               <button
                 type="submit"
                 className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors flex items-center gap-2 font-medium justify-center"
@@ -174,96 +176,6 @@ export function TaskList() {
               </button>
             </div>
           </div>
-
-          {/* Advanced Options */}
-          {showAdvancedOptions && (
-            <div className="mt-4 p-4 bg-card border border-border rounded-lg space-y-4">
-              {/* Tags */}
-              <div>
-                <label className="text-sm text-text-muted mb-2 block">Tags (subcategories)</label>
-                <div className="flex gap-2 flex-wrap mb-2">
-                  {tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm flex items-center gap-2"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveTag(tag)}
-                        className="hover:text-accent-hover"
-                      >
-                        <X size={14} />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Add a tag..."
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-                    className="flex-1 px-3 py-2 bg-background border border-border rounded text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddTag}
-                    className="px-4 py-2 bg-accent text-white rounded hover:bg-accent-hover transition-colors text-sm"
-                  >
-                    Add Tag
-                  </button>
-                </div>
-              </div>
-
-              {/* Time Range */}
-              <div>
-                <label className="text-sm text-text-muted mb-2 block">Time Range</label>
-                <div className="flex gap-2">
-                  <input
-                    type="time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-background border border-border rounded text-sm text-text focus:outline-none focus:border-accent"
-                  />
-                  <span className="text-text-muted self-center">to</span>
-                  <input
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-background border border-border rounded text-sm text-text focus:outline-none focus:border-accent"
-                  />
-                </div>
-              </div>
-
-              {/* Due Date */}
-              <div>
-                <label className="text-sm text-text-muted mb-2 block">Due Date</label>
-                <input
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-background border border-border rounded text-sm text-text focus:outline-none focus:border-accent"
-                />
-              </div>
-
-              {/* Duration Option */}
-              <div>
-                <label className="text-sm text-text-muted mb-2 block">Duration</label>
-                <select
-                  value={durationOption}
-                  onChange={(e) => setDurationOption(e.target.value as any)}
-                  className="w-full px-3 py-2 bg-background border border-border rounded text-sm text-text focus:outline-none focus:border-accent"
-                >
-                  <option value="none">None</option>
-                  <option value="allDay">All Day</option>
-                  <option value="allWeek">All Week</option>
-                  <option value="allMonth">All Month</option>
-                </select>
-              </div>
-            </div>
-          )}
         </form>
       )}
 
@@ -272,7 +184,7 @@ export function TaskList() {
         {filteredTasks.length === 0 ? (
           <div className="bg-card border border-border rounded-card p-8 text-center">
             <p className="text-text-muted text-sm">
-              {currentView === 'completed' ? 'No completed tasks yet' : currentView === 'fun' ? 'No fun activities yet. Add one above!' : 'No tasks yet. Add one above!'}
+              {currentView === 'completed' ? 'No completed tasks yet' : currentView === 'fun' ? 'No fun activities yet. Add one above!' : currentView === 'wantToBuy' ? 'No items to buy yet. Add one above!' : 'No tasks yet. Add one above!'}
             </p>
           </div>
         ) : (
@@ -346,24 +258,32 @@ export function TaskList() {
                   
                   {/* Task Details */}
                   <div className="mt-2 flex flex-wrap gap-2 items-center">
-                    {task.tags && task.tags.length > 0 && (
-                      <div className="flex gap-1 flex-wrap">
-                        {task.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-2 py-0.5 bg-accent/10 text-accent rounded-full text-xs"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                     {task.durationOption && task.durationOption !== 'none' && (
                       <span className="text-xs text-accent">
                         {task.durationOption === 'allDay' ? 'All Day' : task.durationOption === 'allWeek' ? 'All Week' : 'All Month'}
                       </span>
                     )}
                   </div>
+
+                  {/* Subcategories */}
+                  {tasks.filter(t => t.parentTaskId === task.id).map((subcategory) => (
+                    <div key={subcategory.id} className="ml-4 mt-2 flex items-center gap-2">
+                      <span className="text-text-muted text-sm">-</span>
+                      <span className={`text-sm ${subcategory.completed ? 'line-through text-text-muted' : 'text-text'}`}>
+                        {subcategory.title}
+                      </span>
+                      <button
+                        onClick={() => toggleTaskComplete(subcategory.id!)}
+                        className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                          subcategory.completed 
+                            ? 'bg-accent border-accent text-white' 
+                            : 'border-border hover:border-accent'
+                        }`}
+                      >
+                        {subcategory.completed && <Check size={10} />}
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -386,7 +306,10 @@ export function TaskList() {
 
               {/* Plus button at bottom middle of task box */}
               <button
-                onClick={() => setShowTagModal(true)}
+                onClick={() => {
+                  setSelectedTaskId(task.id);
+                  setShowSubcategoryModal(true);
+                }}
                 className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 bg-accent/20 text-accent rounded-full hover:bg-accent/30 transition-all flex items-center justify-center"
               >
                 <Plus size={14} />
@@ -396,53 +319,36 @@ export function TaskList() {
         )}
       </div>
 
-      {/* Tag Modal */}
-      {showTagModal && (
+      {/* Subcategory Modal */}
+      {showSubcategoryModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-card rounded-card p-6 max-w-md w-full">
-            <h2 className="text-xl font-bold text-text mb-4">Manage Tags</h2>
-            <div className="space-y-3 mb-4">
-              {allTags.map((tag) => (
-                <div
-                  key={tag}
-                  className="flex items-center justify-between p-3 bg-background rounded-lg"
-                >
-                  <span className="text-text">{tag}</span>
-                  <button
-                    onClick={() => setAllTags(allTags.filter(t => t !== tag))}
-                    className="text-text-muted hover:text-red-500"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-              ))}
-            </div>
+            <h2 className="text-xl font-bold text-text mb-4">Add Subcategory</h2>
+            <input
+              type="text"
+              placeholder="Subcategory name..."
+              value={subcategoryTitle}
+              onChange={(e) => setSubcategoryTitle(e.target.value)}
+              className="w-full px-3 py-2 bg-background border border-border rounded text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent mb-4"
+            />
             <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="New tag name..."
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                className="flex-1 px-3 py-2 bg-background border border-border rounded text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent"
-              />
               <button
-                onClick={() => {
-                  if (tagInput.trim() && !allTags.includes(tagInput.trim())) {
-                    setAllTags([...allTags, tagInput.trim()]);
-                    setTagInput('');
-                  }
-                }}
-                className="px-4 py-2 bg-accent text-white rounded hover:bg-accent-hover transition-colors"
+                onClick={handleAddSubcategory}
+                className="flex-1 px-4 py-2 bg-accent text-white rounded hover:bg-accent-hover transition-colors"
               >
                 Add
               </button>
+              <button
+                onClick={() => {
+                  setShowSubcategoryModal(false);
+                  setSelectedTaskId(null);
+                  setSubcategoryTitle('');
+                }}
+                className="flex-1 px-4 py-2 bg-background border border-border rounded text-text hover:border-accent transition-colors"
+              >
+                Cancel
+              </button>
             </div>
-            <button
-              onClick={() => setShowTagModal(false)}
-              className="w-full mt-4 px-4 py-2 bg-background border border-border rounded text-text hover:border-accent transition-colors"
-            >
-              Close
-            </button>
           </div>
         </div>
       )}

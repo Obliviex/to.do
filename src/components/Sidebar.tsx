@@ -1,4 +1,4 @@
-import { Home, Timer, CheckCircle2, Menu, X, Sparkles } from 'lucide-react';
+import { Home, Timer, CheckCircle2, Menu, X, Sparkles, ShoppingCart } from 'lucide-react';
 import { useTodoStore } from '../store/store';
 import { useState } from 'react';
 
@@ -17,6 +17,7 @@ export function Sidebar() {
     { id: 'timer', label: 'Timer', icon: Timer },
     { id: 'home', label: 'Tasks', icon: Home },
     { id: 'fun', label: 'Fun', icon: Sparkles },
+    { id: 'wantToBuy', label: 'Want to Buy', icon: ShoppingCart },
     { id: 'completed', label: 'Completed', icon: CheckCircle2 },
   ];
 
