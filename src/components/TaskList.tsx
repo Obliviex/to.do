@@ -22,10 +22,6 @@ export function TaskList() {
   const [editTitle, setEditTitle] = useState('');
   const [isFunTask, setIsFunTask] = useState(false);
   const [isWantToBuyTask, setIsWantToBuyTask] = useState(false);
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [durationOption, setDurationOption] = useState<'none' | 'allDay' | 'allWeek' | 'allMonth'>('none');
   const [showSubcategoryModal, setShowSubcategoryModal] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
   const [subcategoryTitle, setSubcategoryTitle] = useState('');
@@ -52,25 +48,16 @@ export function TaskList() {
     if (!newTaskTitle.trim()) return;
     
     const listId = lists[0]?.id || 1;
-    const parsedDueDate = dueDate ? new Date(dueDate) : undefined;
     await addTask(
       newTaskTitle, 
       listId, 
       currentView === 'fun' ? true : isFunTask,
       currentView === 'wantToBuy' ? true : isWantToBuyTask,
-      undefined,
-      startTime || undefined,
-      endTime || undefined,
-      parsedDueDate,
-      durationOption !== 'none' ? durationOption : undefined
+      undefined
     );
     setNewTaskTitle('');
     setIsFunTask(false);
     setIsWantToBuyTask(false);
-    setStartTime('');
-    setEndTime('');
-    setDueDate('');
-    setDurationOption('none');
   };
 
   const handleAddSubcategory = async () => {
@@ -206,27 +193,6 @@ export function TaskList() {
                 {task.completed && <Check size={14} />}
               </button>
 
-              {/* Time and Due Date Controls */}
-              <div className="flex gap-2 items-center mt-0.5">
-                <input
-                  type="time"
-                  value={task.startTime || ''}
-                  onChange={(e) => updateTask(task.id!, { startTime: e.target.value })}
-                  className="px-2 py-1 bg-background border border-border rounded text-xs text-text focus:outline-none focus:border-accent"
-                />
-                <input
-                  type="time"
-                  value={task.endTime || ''}
-                  onChange={(e) => updateTask(task.id!, { endTime: e.target.value })}
-                  className="px-2 py-1 bg-background border border-border rounded text-xs text-text focus:outline-none focus:border-accent"
-                />
-                <input
-                  type="date"
-                  value={task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : ''}
-                  onChange={(e) => updateTask(task.id!, { dueDate: e.target.value ? new Date(e.target.value) : undefined })}
-                  className="px-2 py-1 bg-background border border-border rounded text-xs text-text focus:outline-none focus:border-accent"
-                />
-              </div>
 
               {editingId === task.id ? (
                 <div className="flex-1 flex gap-2">
@@ -256,14 +222,6 @@ export function TaskList() {
                     {task.title}
                   </span>
                   
-                  {/* Task Details */}
-                  <div className="mt-2 flex flex-wrap gap-2 items-center">
-                    {task.durationOption && task.durationOption !== 'none' && (
-                      <span className="text-xs text-accent">
-                        {task.durationOption === 'allDay' ? 'All Day' : task.durationOption === 'allWeek' ? 'All Week' : 'All Month'}
-                      </span>
-                    )}
-                  </div>
 
                   {/* Subcategories */}
                   {tasks.filter(t => t.parentTaskId === task.id).map((subcategory) => (
