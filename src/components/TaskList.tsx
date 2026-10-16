@@ -265,7 +265,7 @@ export function TaskList() {
               {/* Plus button at bottom middle of task box */}
               <button
                 onClick={() => {
-                  setSelectedTaskId(task.id);
+                  setSelectedTaskId(task.id || null);
                   setShowSubcategoryModal(true);
                 }}
                 className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 bg-accent/20 text-accent rounded-full hover:bg-accent/30 transition-all flex items-center justify-center"
