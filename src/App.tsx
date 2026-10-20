@@ -6,7 +6,7 @@ import { PomodoroTimer } from './components/PomodoroTimer';
 import { useTodoStore } from './store/store';
 
 function App() {
-  const { loadTasks, loadLists, currentView, timerMode } = useTodoStore();
+  const { loadTasks, loadLists, currentView, timerMode, darkMode } = useTodoStore();
 
   useEffect(() => {
     loadTasks();
@@ -27,7 +27,7 @@ function App() {
   };
 
   return (
-    <div className={`flex min-h-screen ${currentView === 'timer' ? getBackgroundColor() : 'bg-background'} lg:pl-0`}>
+    <div className={`flex min-h-screen ${darkMode ? 'bg-dark-background text-dark-text' : 'bg-background text-text'} ${currentView === 'timer' ? getBackgroundColor() : ''} lg:pl-0`}>
       <Sidebar />
       <main className="flex-1 flex lg:ml-0">
         <div className="flex-1 lg:ml-64 p-6">
@@ -40,7 +40,7 @@ function App() {
           )}
         </div>
         {currentView === 'home' && (
-          <aside className="hidden lg:block w-80 p-6 border-l border-border">
+          <aside className={`hidden lg:block w-80 p-6 border-l ${darkMode ? 'border-dark-border' : 'border-border'}`}>
             <StatsCard />
           </aside>
         )}

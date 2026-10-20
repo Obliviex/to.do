@@ -3,7 +3,7 @@ import { useTodoStore } from '../store/store';
 import { startOfDay, subDays, format } from 'date-fns';
 
 export function StatsCard() {
-  const { tasks } = useTodoStore();
+  const { tasks, darkMode } = useTodoStore();
 
   // Get completed tasks for the last 7 days
   const getLast7DaysData = () => {
@@ -30,19 +30,19 @@ export function StatsCard() {
   const completionRate = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
 
   return (
-    <div className="bg-card border border-border rounded-card p-6">
+    <div className={`${darkMode ? 'bg-dark-card border-dark-border' : 'bg-card border-border'} rounded-card p-6`}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-text font-semibold">Progress</h3>
-        <span className="text-text-muted text-xs">Last 7 days</span>
+        <h3 className={`${darkMode ? 'text-dark-text' : 'text-text'} font-semibold`}>Progress</h3>
+        <span className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-xs`}>Last 7 days</span>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div>
-          <p className="text-text-muted text-xs uppercase tracking-wider mb-1">Completed</p>
-          <p className="text-2xl font-bold text-text">{totalCompleted}</p>
+          <p className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-xs uppercase tracking-wider mb-1`}>Completed</p>
+          <p className={`text-2xl font-bold ${darkMode ? 'text-dark-text' : 'text-text'}`}>{totalCompleted}</p>
         </div>
         <div>
-          <p className="text-text-muted text-xs uppercase tracking-wider mb-1">Rate</p>
+          <p className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-xs uppercase tracking-wider mb-1`}>Rate</p>
           <p className="text-2xl font-bold text-accent">{completionRate}%</p>
         </div>
       </div>
@@ -50,22 +50,23 @@ export function StatsCard() {
       <div className="h-32">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E5E3" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? '#3A3A3A' : '#E5E5E3'} />
             <XAxis 
               dataKey="day" 
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#6B6B6B', fontSize: 12 }}
+              tick={{ fill: darkMode ? '#A0A0A0' : '#6B6B6B', fontSize: 12 }}
             />
             <YAxis 
               hide
             />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: '#FFFFFF', 
-                border: '1px solid #E5E5E3',
+                backgroundColor: darkMode ? '#252525' : '#FFFFFF', 
+                border: darkMode ? '1px solid #3A3A3A' : '1px solid #E5E5E3',
                 borderRadius: '8px',
-                fontFamily: 'monospace'
+                fontFamily: 'Lexend, sans-serif',
+                color: darkMode ? '#E5E5E5' : '#2D2D2D'
               }}
             />
             <Bar 

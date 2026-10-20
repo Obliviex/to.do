@@ -14,7 +14,8 @@ export function TaskList() {
     deleteTask, 
     toggleTaskComplete,
     setSearchQuery,
-    setSortBy
+    setSortBy,
+    darkMode
   } = useTodoStore();
 
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -88,13 +89,13 @@ export function TaskList() {
     <div className="flex-1 p-4 lg:p-6 pt-16 lg:pt-6 relative">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl lg:text-3xl font-bold text-text mb-2">
+        <h1 className={`text-2xl lg:text-3xl font-bold ${darkMode ? 'text-dark-text' : 'text-text'} mb-2`}>
           {currentView === 'home' && 'Tasks'}
           {currentView === 'fun' && 'Fun Tasks'}
           {currentView === 'wantToBuy' && 'Want to Buy'}
           {currentView === 'completed' && 'Completed'}
         </h1>
-        <p className="text-text-muted text-sm">
+        <p className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>
           {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
         </p>
       </div>
@@ -102,18 +103,18 @@ export function TaskList() {
       {/* Search and Sort */}
       <div className="flex gap-3 mb-6 flex-col sm:flex-row">
         <div className="flex-1 relative">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+          <Search size={18} className={`absolute left-3 top-1/2 -translate-y-1/2 ${darkMode ? 'text-dark-text-muted' : 'text-text-muted'}`} />
           <input
             type="text"
             placeholder="Search tasks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent"
+            className={`w-full pl-10 pr-4 py-2.5 ${darkMode ? 'bg-dark-card border-dark-border text-dark-text placeholder:text-dark-text-muted' : 'bg-card border-border text-text placeholder:text-text-muted'} rounded-lg text-sm focus:outline-none focus:border-accent`}
           />
         </div>
         <button
           onClick={() => setSortBy(sortBy === 'date' ? 'name' : 'date')}
-          className="px-4 py-2.5 bg-card border border-border rounded-lg text-text-muted hover:text-text hover:border-accent transition-colors flex items-center gap-2 justify-center sm:justify-start"
+          className={`px-4 py-2.5 ${darkMode ? 'bg-dark-card border-dark-border text-dark-text-muted hover:text-dark-text hover:border-accent' : 'bg-card border-border text-text-muted hover:text-text hover:border-accent'} rounded-lg transition-colors flex items-center gap-2 justify-center sm:justify-start`}
         >
           <SortAsc size={18} />
           <span className="text-sm">{sortBy === 'date' ? 'Date' : 'Name'}</span>
@@ -129,29 +130,29 @@ export function TaskList() {
               placeholder={currentView === 'fun' ? "Add a fun activity..." : currentView === 'wantToBuy' ? "Add something to buy..." : "Add a new task..."}
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
-              className="flex-1 px-4 py-3 bg-card border border-border rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent"
+              className={`flex-1 px-4 py-3 ${darkMode ? 'bg-dark-card border-dark-border text-dark-text placeholder:text-dark-text-muted' : 'bg-card border-border text-text placeholder:text-text-muted'} rounded-lg text-sm focus:outline-none focus:border-accent`}
             />
             <div className="flex gap-2">
               {currentView === 'home' && (
-                <label className="flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-lg cursor-pointer hover:border-accent transition-colors">
+                <label className={`flex items-center gap-2 px-4 py-3 ${darkMode ? 'bg-dark-card border-dark-border' : 'bg-card border-border'} rounded-lg cursor-pointer hover:border-accent transition-colors`}>
                   <input
                     type="checkbox"
                     checked={isFunTask}
                     onChange={(e) => setIsFunTask(e.target.checked)}
                     className="w-4 h-4 accent-accent"
                   />
-                  <span className="text-sm text-text">Fun</span>
+                  <span className={`text-sm ${darkMode ? 'text-dark-text' : 'text-text'}`}>Fun</span>
                 </label>
               )}
               {currentView === 'home' && (
-                <label className="flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-lg cursor-pointer hover:border-accent transition-colors">
+                <label className={`flex items-center gap-2 px-4 py-3 ${darkMode ? 'bg-dark-card border-dark-border' : 'bg-card border-border'} rounded-lg cursor-pointer hover:border-accent transition-colors`}>
                   <input
                     type="checkbox"
                     checked={isWantToBuyTask}
                     onChange={(e) => setIsWantToBuyTask(e.target.checked)}
                     className="w-4 h-4 accent-accent"
                   />
-                  <span className="text-sm text-text">Want to Buy</span>
+                  <span className={`text-sm ${darkMode ? 'text-dark-text' : 'text-text'}`}>Want to Buy</span>
                 </label>
               )}
               <button
@@ -169,8 +170,8 @@ export function TaskList() {
       {/* Task List */}
       <div className="space-y-2">
         {filteredTasks.length === 0 ? (
-          <div className="bg-card border border-border rounded-card p-8 text-center">
-            <p className="text-text-muted text-sm">
+          <div className={`${darkMode ? 'bg-dark-card border-dark-border' : 'bg-card border-border'} rounded-card p-8 text-center`}>
+            <p className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>
               {currentView === 'completed' ? 'No completed tasks yet' : currentView === 'fun' ? 'No fun activities yet. Add one above!' : currentView === 'wantToBuy' ? 'No items to buy yet. Add one above!' : 'No tasks yet. Add one above!'}
             </p>
           </div>
@@ -178,7 +179,7 @@ export function TaskList() {
           filteredTasks.map((task) => (
             <div
               key={task.id}
-              className={`bg-card border border-border rounded-card p-4 flex items-start gap-4 transition-all relative ${
+              className={`${darkMode ? 'bg-dark-card border-dark-border' : 'bg-card border-border'} rounded-card p-4 flex items-start gap-4 transition-all relative ${
                 task.completed ? 'opacity-60' : ''
               }`}
             >
@@ -187,7 +188,7 @@ export function TaskList() {
                 className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors mt-0.5 ${
                   task.completed 
                     ? 'bg-accent border-accent text-white' 
-                    : 'border-border hover:border-accent'
+                    : `${darkMode ? 'border-dark-border hover:border-accent' : 'border-border hover:border-accent'}`
                 }`}
               >
                 {task.completed && <Check size={14} />}
@@ -200,7 +201,7 @@ export function TaskList() {
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-background border border-border rounded text-sm text-text focus:outline-none focus:border-accent"
+                    className={`flex-1 px-3 py-2 ${darkMode ? 'bg-dark-background-dark border-dark-border text-dark-text' : 'bg-background border-border text-text'} rounded text-sm focus:outline-none focus:border-accent`}
                     autoFocus
                   />
                   <button
@@ -218,7 +219,7 @@ export function TaskList() {
                 </div>
               ) : (
                 <div className="flex-1">
-                  <span className={`text-sm block ${task.completed ? 'line-through text-text-muted' : 'text-text'}`}>
+                  <span className={`text-sm block ${task.completed ? (darkMode ? 'line-through text-dark-text-muted' : 'line-through text-text-muted') : (darkMode ? 'text-dark-text' : 'text-text')}`}>
                     {task.title}
                   </span>
                   
@@ -226,8 +227,8 @@ export function TaskList() {
                   {/* Subcategories */}
                   {tasks.filter(t => t.parentTaskId === task.id).map((subcategory) => (
                     <div key={subcategory.id} className="ml-4 mt-2 flex items-center gap-2">
-                      <span className="text-text-muted text-sm">-</span>
-                      <span className={`text-sm ${subcategory.completed ? 'line-through text-text-muted' : 'text-text'}`}>
+                      <span className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>-</span>
+                      <span className={`text-sm ${subcategory.completed ? (darkMode ? 'line-through text-dark-text-muted' : 'line-through text-text-muted') : (darkMode ? 'text-dark-text' : 'text-text')}`}>
                         {subcategory.title}
                       </span>
                       <button
@@ -235,7 +236,7 @@ export function TaskList() {
                         className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
                           subcategory.completed 
                             ? 'bg-accent border-accent text-white' 
-                            : 'border-border hover:border-accent'
+                            : `${darkMode ? 'border-dark-border hover:border-accent' : 'border-border hover:border-accent'}`
                         }`}
                       >
                         {subcategory.completed && <Check size={10} />}
@@ -249,13 +250,13 @@ export function TaskList() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEditStart(task)}
-                    className="p-2 text-text-muted hover:text-text hover:bg-background rounded transition-colors"
+                    className={`p-2 ${darkMode ? 'text-dark-text-muted hover:text-dark-text hover:bg-dark-background-dark' : 'text-text-muted hover:text-text hover:bg-background'} rounded transition-colors`}
                   >
                     <Pencil size={16} />
                   </button>
                   <button
                     onClick={() => deleteTask(task.id!)}
-                    className="p-2 text-text-muted hover:text-red-500 hover:bg-background rounded transition-colors"
+                    className={`p-2 ${darkMode ? 'text-dark-text-muted hover:text-red-500 hover:bg-dark-background-dark' : 'text-text-muted hover:text-red-500 hover:bg-background'} rounded transition-colors`}
                   >
                     <Trash2 size={16} />
                   </button>
@@ -280,14 +281,14 @@ export function TaskList() {
       {/* Subcategory Modal */}
       {showSubcategoryModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-card rounded-card p-6 max-w-md w-full">
-            <h2 className="text-xl font-bold text-text mb-4">Add Subcategory</h2>
+          <div className={`${darkMode ? 'bg-dark-card' : 'bg-card'} rounded-card p-6 max-w-md w-full`}>
+            <h2 className={`text-xl font-bold ${darkMode ? 'text-dark-text' : 'text-text'} mb-4`}>Add Subcategory</h2>
             <input
               type="text"
               placeholder="Subcategory name..."
               value={subcategoryTitle}
               onChange={(e) => setSubcategoryTitle(e.target.value)}
-              className="w-full px-3 py-2 bg-background border border-border rounded text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent mb-4"
+              className={`w-full px-3 py-2 ${darkMode ? 'bg-dark-background-dark border-dark-border text-dark-text placeholder:text-dark-text-muted' : 'bg-background border-border text-text placeholder:text-text-muted'} rounded text-sm focus:outline-none focus:border-accent mb-4`}
             />
             <div className="flex gap-2">
               <button
@@ -302,7 +303,7 @@ export function TaskList() {
                   setSelectedTaskId(null);
                   setSubcategoryTitle('');
                 }}
-                className="flex-1 px-4 py-2 bg-background border border-border rounded text-text hover:border-accent transition-colors"
+                className={`flex-1 px-4 py-2 bg-background border border-border rounded ${darkMode ? 'text-dark-text hover:border-accent' : 'text-text hover:border-accent'} transition-colors`}
               >
                 Cancel
               </button>

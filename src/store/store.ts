@@ -12,6 +12,7 @@ interface TodoStore {
   streak: number;
   lastCompletedDate: Date | null;
   timerMode: 'pomodoro' | 'shortBreak' | 'longBreak';
+  darkMode: boolean;
   
   loadTasks: () => Promise<void>;
   loadLists: () => Promise<void>;
@@ -26,6 +27,7 @@ interface TodoStore {
   setSearchQuery: (query: string) => void;
   setSortBy: (sort: 'date' | 'name') => void;
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => void;
+  toggleDarkMode: () => void;
   calculateStreak: () => void;
 }
 
@@ -39,6 +41,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   streak: 0,
   lastCompletedDate: null,
   timerMode: 'pomodoro',
+  darkMode: false,
 
   loadTasks: async () => {
     const tasks = await db.tasks.toArray();
@@ -136,6 +139,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   setSearchQuery: (query: string) => set({ searchQuery: query }),
   setSortBy: (sort: 'date' | 'name') => set({ sortBy: sort }),
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => set({ timerMode: mode }),
+  toggleDarkMode: () => set(state => ({ darkMode: !state.darkMode })),
 
   calculateStreak: () => {
     const { tasks, lastCompletedDate } = get();

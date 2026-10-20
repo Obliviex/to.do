@@ -7,6 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        sans: ['"Lexend"', 'sans-serif'],
         mono: ['"JetBrains Mono"', '"IBM Plex Mono"', 'monospace'],
       },
       colors: {
@@ -21,6 +22,14 @@ export default {
         'accent-hover': '#35965C',
         turquoise: '#40E0D0',
         blue: '#4A90E2',
+        // Dark mode colors
+        'dark-background': '#1A1A1A',
+        'dark-background-dark': '#2A2A2A',
+        'dark-card': '#252525',
+        'dark-card-light': '#303030',
+        'dark-border': '#3A3A3A',
+        'dark-text': '#E5E5E5',
+        'dark-text-muted': '#A0A0A0',
       },
       borderRadius: {
         'card': '12px',
