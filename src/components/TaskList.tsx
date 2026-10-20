@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, SortAsc, Check, X, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Search, SortAsc, Check, X, Pencil, Trash2, Minus } from 'lucide-react';
 import { useTodoStore } from '../store/store';
 
 export function TaskList() {
@@ -228,6 +228,22 @@ export function TaskList() {
                   {/* Subcategories - show when expanded */}
                   {expandedTaskIds.has(task.id!) && (
                     <div className="mt-3 space-y-2">
+                      <div className="ml-4 flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            const taskId = task.id!;
+                            setExpandedTaskIds(prev => {
+                              const newSet = new Set(prev);
+                              newSet.delete(taskId);
+                              return newSet;
+                            });
+                          }}
+                          className="w-6 h-6 bg-accent/20 text-accent rounded-full hover:bg-accent/30 transition-all flex items-center justify-center"
+                        >
+                          <Minus size={12} />
+                        </button>
+                        <span className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-xs`}>Collapse</span>
+                      </div>
                       {tasks.filter(t => t.parentTaskId === task.id).map((subcategory) => (
                         <div key={subcategory.id} className="ml-4 flex items-center gap-2">
                           <span className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>-</span>
