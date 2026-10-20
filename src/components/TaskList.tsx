@@ -23,9 +23,9 @@ export function TaskList() {
   const [editTitle, setEditTitle] = useState('');
   const [isFunTask, setIsFunTask] = useState(false);
   const [isWantToBuyTask, setIsWantToBuyTask] = useState(false);
-  const [showSubcategoryModal, setShowSubcategoryModal] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
   const [subcategoryTitle, setSubcategoryTitle] = useState('');
+  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<number>>(new Set());
 
   const filteredTasks = tasks
     .filter(task => {
@@ -66,8 +66,9 @@ export function TaskList() {
     const listId = lists[0]?.id || 1;
     await addTask(subcategoryTitle, listId, false, false, selectedTaskId);
     setSubcategoryTitle('');
-    setShowSubcategoryModal(false);
     setSelectedTaskId(null);
+    // Expand the task to show the new subcategory
+    setExpandedTaskIds(prev => new Set([...prev, selectedTaskId]));
   };
 
   const handleEditStart = (task: any) => {
@@ -224,25 +225,48 @@ export function TaskList() {
                   </span>
                   
 
-                  {/* Subcategories */}
-                  {tasks.filter(t => t.parentTaskId === task.id).map((subcategory) => (
-                    <div key={subcategory.id} className="ml-4 mt-2 flex items-center gap-2">
-                      <span className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>-</span>
-                      <span className={`text-sm ${subcategory.completed ? (darkMode ? 'line-through text-dark-text-muted' : 'line-through text-text-muted') : (darkMode ? 'text-dark-text' : 'text-text')}`}>
-                        {subcategory.title}
-                      </span>
-                      <button
-                        onClick={() => toggleTaskComplete(subcategory.id!)}
-                        className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
-                          subcategory.completed 
-                            ? 'bg-accent border-accent text-white' 
-                            : `${darkMode ? 'border-dark-border hover:border-accent' : 'border-border hover:border-accent'}`
-                        }`}
-                      >
-                        {subcategory.completed && <Check size={10} />}
-                      </button>
+                  {/* Subcategories - show when expanded */}
+                  {expandedTaskIds.has(task.id!) && (
+                    <div className="mt-3 space-y-2">
+                      {tasks.filter(t => t.parentTaskId === task.id).map((subcategory) => (
+                        <div key={subcategory.id} className="ml-4 flex items-center gap-2">
+                          <span className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>-</span>
+                          <span className={`text-sm ${subcategory.completed ? (darkMode ? 'line-through text-dark-text-muted' : 'line-through text-text-muted') : (darkMode ? 'text-dark-text' : 'text-text')}`}>
+                            {subcategory.title}
+                          </span>
+                          <button
+                            onClick={() => toggleTaskComplete(subcategory.id!)}
+                            className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                              subcategory.completed 
+                                ? 'bg-accent border-accent text-white' 
+                                : `${darkMode ? 'border-dark-border hover:border-accent' : 'border-border hover:border-accent'}`
+                            }`}
+                          >
+                            {subcategory.completed && <Check size={10} />}
+                          </button>
+                        </div>
+                      ))}
+                      {/* Inline add subcategory input */}
+                      <div className="ml-4 flex items-center gap-2">
+                        <span className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>+</span>
+                        <input
+                          type="text"
+                          placeholder="Add subcategory..."
+                          value={selectedTaskId === task.id ? subcategoryTitle : ''}
+                          onChange={(e) => {
+                            setSubcategoryTitle(e.target.value);
+                            setSelectedTaskId(task.id || null);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleAddSubcategory();
+                            }
+                          }}
+                          className={`flex-1 px-2 py-1 text-sm ${darkMode ? 'bg-dark-background-dark border-dark-border text-dark-text placeholder:text-dark-text-muted' : 'bg-background border-border text-text placeholder:text-text-muted'} rounded focus:outline-none focus:border-accent`}
+                        />
+                      </div>
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
 
@@ -266,8 +290,17 @@ export function TaskList() {
               {/* Plus button at bottom middle of task box */}
               <button
                 onClick={() => {
-                  setSelectedTaskId(task.id || null);
-                  setShowSubcategoryModal(true);
+                  const taskId = task.id!;
+                  // Toggle expanded state
+                  setExpandedTaskIds(prev => {
+                    const newSet = new Set(prev);
+                    if (newSet.has(taskId)) {
+                      newSet.delete(taskId);
+                    } else {
+                      newSet.add(taskId);
+                    }
+                    return newSet;
+                  });
                 }}
                 className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 bg-accent/20 text-accent rounded-full hover:bg-accent/30 transition-all flex items-center justify-center"
               >
@@ -277,40 +310,6 @@ export function TaskList() {
           ))
         )}
       </div>
-
-      {/* Subcategory Modal */}
-      {showSubcategoryModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className={`${darkMode ? 'bg-dark-card' : 'bg-card'} rounded-card p-6 max-w-md w-full`}>
-            <h2 className={`text-xl font-bold ${darkMode ? 'text-dark-text' : 'text-text'} mb-4`}>Add Subcategory</h2>
-            <input
-              type="text"
-              placeholder="Subcategory name..."
-              value={subcategoryTitle}
-              onChange={(e) => setSubcategoryTitle(e.target.value)}
-              className={`w-full px-3 py-2 ${darkMode ? 'bg-dark-background-dark border-dark-border text-dark-text placeholder:text-dark-text-muted' : 'bg-background border-border text-text placeholder:text-text-muted'} rounded text-sm focus:outline-none focus:border-accent mb-4`}
-            />
-            <div className="flex gap-2">
-              <button
-                onClick={handleAddSubcategory}
-                className="flex-1 px-4 py-2 bg-accent text-white rounded hover:bg-accent-hover transition-colors"
-              >
-                Add
-              </button>
-              <button
-                onClick={() => {
-                  setShowSubcategoryModal(false);
-                  setSelectedTaskId(null);
-                  setSubcategoryTitle('');
-                }}
-                className={`flex-1 px-4 py-2 bg-background border border-border rounded ${darkMode ? 'text-dark-text hover:border-accent' : 'text-text hover:border-accent'} transition-colors`}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
