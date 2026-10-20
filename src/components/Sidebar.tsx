@@ -1,4 +1,4 @@
-import { Home, Timer, CheckCircle2, Menu, X, Sparkles, ShoppingCart, Flame, Moon, Sun } from 'lucide-react';
+import { Home, Timer, CheckCircle2, Menu, X, Sparkles, ShoppingCart, Flame } from 'lucide-react';
 import { useTodoStore } from '../store/store';
 import { useState } from 'react';
 
@@ -90,10 +90,12 @@ export function Sidebar() {
         {/* Dark Mode Toggle */}
         <button
           onClick={toggleDarkMode}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-3 transition-colors ${darkMode ? 'text-dark-text-muted hover:bg-dark-background-dark hover:text-dark-text' : 'text-text-muted hover:bg-background hover:text-text'}`}
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg mb-3 transition-colors ${darkMode ? 'text-dark-text-muted hover:bg-dark-background-dark hover:text-dark-text' : 'text-text-muted hover:bg-background hover:text-text'}`}
         >
-          {darkMode ? <Sun size={18} /> : <Moon size={18} />}
           <span className="text-sm font-medium">Dark Mode</span>
+          <div className={`w-12 h-6 rounded-full p-1 transition-colors ${darkMode ? 'bg-accent' : 'bg-gray-300'}`}>
+            <div className={`w-4 h-4 rounded-full bg-white transition-transform ${darkMode ? 'translate-x-6' : 'translate-x-0'}`} />
+          </div>
         </button>
 
         <div className="flex items-center gap-3 px-3">
