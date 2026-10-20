@@ -287,25 +287,27 @@ export function TaskList() {
                 </div>
               )}
 
-              {/* Plus button at bottom middle of task box */}
-              <button
-                onClick={() => {
-                  const taskId = task.id!;
-                  // Toggle expanded state
-                  setExpandedTaskIds(prev => {
-                    const newSet = new Set(prev);
-                    if (newSet.has(taskId)) {
-                      newSet.delete(taskId);
-                    } else {
-                      newSet.add(taskId);
-                    }
-                    return newSet;
-                  });
-                }}
-                className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 bg-accent/20 text-accent rounded-full hover:bg-accent/30 transition-all flex items-center justify-center"
-              >
-                <Plus size={14} />
-              </button>
+              {/* Plus button at bottom middle of task box - hide when expanded */}
+              {!expandedTaskIds.has(task.id!) && (
+                <button
+                  onClick={() => {
+                    const taskId = task.id!;
+                    // Toggle expanded state
+                    setExpandedTaskIds(prev => {
+                      const newSet = new Set(prev);
+                      if (newSet.has(taskId)) {
+                        newSet.delete(taskId);
+                      } else {
+                        newSet.add(taskId);
+                      }
+                      return newSet;
+                    });
+                  }}
+                  className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 bg-accent/20 text-accent rounded-full hover:bg-accent/30 transition-all flex items-center justify-center"
+                >
+                  <Plus size={14} />
+                </button>
+              )}
             </div>
           ))
         )}
