@@ -225,25 +225,33 @@ export function TaskList() {
                   </span>
                   
 
+                  {/* Expand/Collapse button */}
+                  <div className="mt-3 ml-4 flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        const taskId = task.id!;
+                        setExpandedTaskIds(prev => {
+                          const newSet = new Set(prev);
+                          if (newSet.has(taskId)) {
+                            newSet.delete(taskId);
+                          } else {
+                            newSet.add(taskId);
+                          }
+                          return newSet;
+                        });
+                      }}
+                      className="w-6 h-6 bg-accent/20 text-accent rounded-full hover:bg-accent/30 transition-all flex items-center justify-center"
+                    >
+                      {expandedTaskIds.has(task.id!) ? <Minus size={12} /> : <Plus size={12} />}
+                    </button>
+                    <span className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-xs`}>
+                      {expandedTaskIds.has(task.id!) ? 'Collapse' : 'Add subcategories'}
+                    </span>
+                  </div>
+
                   {/* Subcategories - show when expanded */}
                   {expandedTaskIds.has(task.id!) && (
                     <div className="mt-3 space-y-2">
-                      <div className="ml-4 flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            const taskId = task.id!;
-                            setExpandedTaskIds(prev => {
-                              const newSet = new Set(prev);
-                              newSet.delete(taskId);
-                              return newSet;
-                            });
-                          }}
-                          className="w-6 h-6 bg-accent/20 text-accent rounded-full hover:bg-accent/30 transition-all flex items-center justify-center"
-                        >
-                          <Minus size={12} />
-                        </button>
-                        <span className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-xs`}>Collapse</span>
-                      </div>
                       {tasks.filter(t => t.parentTaskId === task.id).map((subcategory) => (
                         <div key={subcategory.id} className="ml-4 flex items-center gap-2">
                           <span className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>-</span>
@@ -301,28 +309,6 @@ export function TaskList() {
                     <Trash2 size={16} />
                   </button>
                 </div>
-              )}
-
-              {/* Plus button at bottom middle of task box - hide when expanded */}
-              {!expandedTaskIds.has(task.id!) && (
-                <button
-                  onClick={() => {
-                    const taskId = task.id!;
-                    // Toggle expanded state
-                    setExpandedTaskIds(prev => {
-                      const newSet = new Set(prev);
-                      if (newSet.has(taskId)) {
-                        newSet.delete(taskId);
-                      } else {
-                        newSet.add(taskId);
-                      }
-                      return newSet;
-                    });
-                  }}
-                  className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 bg-accent/20 text-accent rounded-full hover:bg-accent/30 transition-all flex items-center justify-center"
-                >
-                  <Plus size={14} />
-                </button>
               )}
             </div>
           ))
