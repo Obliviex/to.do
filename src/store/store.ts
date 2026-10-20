@@ -13,10 +13,12 @@ interface TodoStore {
   lastCompletedDate: Date | null;
   timerMode: 'pomodoro' | 'shortBreak' | 'longBreak';
   darkMode: boolean;
+  focusMode: boolean;
+  writingMode: boolean;
   
   loadTasks: () => Promise<void>;
   loadLists: () => Promise<void>;
-  addTask: (title: string, listId: number, isFun?: boolean, isWantToBuy?: boolean, parentTaskId?: number) => Promise<void>;
+  addTask: (title: string, listId: number, isFun?: boolean, isWantToBuy?: boolean, parentTaskId?: number, priority?: 'low' | 'medium' | 'high') => Promise<void>;
   updateTask: (id: number, updates: Partial<Task>) => Promise<void>;
   deleteTask: (id: number) => Promise<void>;
   toggleTaskComplete: (id: number) => Promise<void>;
@@ -28,6 +30,8 @@ interface TodoStore {
   setSortBy: (sort: 'date' | 'name') => void;
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => void;
   toggleDarkMode: () => void;
+  toggleFocusMode: () => void;
+  toggleWritingMode: () => void;
   calculateStreak: () => void;
 }
 
@@ -42,6 +46,8 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   lastCompletedDate: null,
   timerMode: 'pomodoro',
   darkMode: false,
+  focusMode: false,
+  writingMode: false,
 
   loadTasks: async () => {
     const tasks = await db.tasks.toArray();
@@ -62,7 +68,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
     set({ lists });
   },
 
-  addTask: async (title: string, listId: number, isFun = false, isWantToBuy = false, parentTaskId?: number) => {
+  addTask: async (title: string, listId: number, isFun = false, isWantToBuy = false, parentTaskId?: number, priority?: 'low' | 'medium' | 'high') => {
     const task = {
       title,
       completed: false,
@@ -70,7 +76,8 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
       createdAt: new Date(),
       isFun,
       isWantToBuy,
-      parentTaskId
+      parentTaskId,
+      priority: priority || 'medium'
     };
     const id = await db.tasks.add(task);
     set(state => ({ tasks: [...state.tasks, { ...task, id }] }));
@@ -140,6 +147,8 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   setSortBy: (sort: 'date' | 'name') => set({ sortBy: sort }),
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => set({ timerMode: mode }),
   toggleDarkMode: () => set(state => ({ darkMode: !state.darkMode })),
+  toggleFocusMode: () => set(state => ({ focusMode: !state.focusMode })),
+  toggleWritingMode: () => set(state => ({ writingMode: !state.writingMode })),
 
   calculateStreak: () => {
     const { tasks, lastCompletedDate } = get();

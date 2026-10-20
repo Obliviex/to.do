@@ -3,10 +3,11 @@ import { Sidebar } from './components/Sidebar';
 import { TaskList } from './components/TaskList';
 import { StatsCard } from './components/StatsCard';
 import { PomodoroTimer } from './components/PomodoroTimer';
+import { WritingMode } from './components/WritingMode';
 import { useTodoStore } from './store/store';
 
 function App() {
-  const { loadTasks, loadLists, currentView, timerMode, darkMode } = useTodoStore();
+  const { loadTasks, loadLists, currentView, timerMode, darkMode, focusMode, writingMode } = useTodoStore();
 
   useEffect(() => {
     loadTasks();
@@ -28,9 +29,10 @@ function App() {
 
   return (
     <div className={`flex min-h-screen ${darkMode ? 'bg-dark-background text-dark-text' : 'bg-background text-text'} ${currentView === 'timer' ? getBackgroundColor() : ''} lg:pl-0`}>
-      <Sidebar />
+      {writingMode && <WritingMode />}
+      {!focusMode && !writingMode && <Sidebar />}
       <main className="flex-1 flex lg:ml-0">
-        <div className="flex-1 lg:ml-64 p-6">
+        <div className={`flex-1 ${focusMode || writingMode ? '' : 'lg:ml-64'} p-6`}>
           {currentView === 'timer' ? (
             <div className="max-w-2xl mx-auto pt-8">
               <PomodoroTimer />
@@ -39,7 +41,7 @@ function App() {
             <TaskList />
           )}
         </div>
-        {currentView === 'home' && (
+        {!focusMode && !writingMode && currentView === 'home' && (
           <aside className={`hidden lg:block w-80 p-6 border-l ${darkMode ? 'border-dark-border' : 'border-border'}`}>
             <StatsCard />
           </aside>

@@ -26,6 +26,7 @@ export function TaskList() {
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
   const [subcategoryTitle, setSubcategoryTitle] = useState('');
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<number>>(new Set());
+  const [taskPriority, setTaskPriority] = useState<'low' | 'medium' | 'high'>('medium');
 
   const filteredTasks = tasks
     .filter(task => {
@@ -44,8 +45,7 @@ export function TaskList() {
       return a.title.localeCompare(b.title);
     });
 
-  const handleAddTask = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddTask = async () => {
     if (!newTaskTitle.trim()) return;
     
     const listId = lists[0]?.id || 1;
@@ -54,11 +54,13 @@ export function TaskList() {
       listId, 
       currentView === 'fun' ? true : isFunTask,
       currentView === 'wantToBuy' ? true : isWantToBuyTask,
-      undefined
+      undefined,
+      taskPriority
     );
     setNewTaskTitle('');
     setIsFunTask(false);
     setIsWantToBuyTask(false);
+    setTaskPriority('medium');
   };
 
   const handleAddSubcategory = async () => {
@@ -156,6 +158,17 @@ export function TaskList() {
                   <span className={`text-sm ${darkMode ? 'text-dark-text' : 'text-text'}`}>Want to Buy</span>
                 </label>
               )}
+              {currentView === 'home' && (
+                <select
+                  value={taskPriority}
+                  onChange={(e) => setTaskPriority(e.target.value as 'low' | 'medium' | 'high')}
+                  className={`px-4 py-3 ${darkMode ? 'bg-dark-card border-dark-border text-dark-text' : 'bg-card border-border text-text'} rounded-lg text-sm focus:outline-none focus:border-accent cursor-pointer`}
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              )}
               <button
                 type="submit"
                 className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors flex items-center gap-2 font-medium justify-center"
@@ -184,6 +197,14 @@ export function TaskList() {
                 task.completed ? 'opacity-60' : ''
               }`}
             >
+              {/* Priority indicator */}
+              {task.priority && !task.completed && (
+                <div className={`w-2 h-2 rounded-full mt-2 ${
+                  task.priority === 'high' ? 'bg-red-500' : 
+                  task.priority === 'medium' ? 'bg-yellow-500' : 
+                  'bg-green-500'
+                }`} />
+              )}
               <button
                 onClick={() => toggleTaskComplete(task.id!)}
                 className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors mt-0.5 ${
