@@ -21,10 +21,13 @@ export default {
         accent: '#3FAE6A',
         'accent-hover': '#35965C',
         'accent-dark': '#2D8A52',
+        'accent-darker': '#1E5A35',
         turquoise: '#40E0D0',
         'turquoise-dark': '#2DB8A8',
+        'turquoise-darker': '#1A7868',
         blue: '#4A90E2',
         'blue-dark': '#3A70C2',
+        'blue-darker': '#1E4080',
         // Dark mode colors
         'dark-background': '#1A1A1A',
         'dark-background-dark': '#2A2A2A',

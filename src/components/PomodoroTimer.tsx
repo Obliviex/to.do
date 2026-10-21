@@ -75,11 +75,11 @@ export function PomodoroTimer() {
   const getModeColor = () => {
     switch (timerMode) {
       case 'pomodoro':
-        return 'bg-accent-dark';
+        return 'bg-accent';
       case 'shortBreak':
-        return 'bg-turquoise-dark';
+        return 'bg-turquoise';
       case 'longBreak':
-        return 'bg-blue-dark';
+        return 'bg-blue';
     }
   };
 

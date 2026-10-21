@@ -17,11 +17,11 @@ function App() {
   const getBackgroundColor = () => {
     switch (timerMode) {
       case 'pomodoro':
-        return 'bg-accent-dark';
+        return 'bg-accent-darker';
       case 'shortBreak':
-        return 'bg-turquoise-dark';
+        return 'bg-turquoise-darker';
       case 'longBreak':
-        return 'bg-blue-dark';
+        return 'bg-blue-darker';
       default:
         return 'bg-background';
     }
