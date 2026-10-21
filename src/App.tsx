@@ -7,7 +7,7 @@ import { WritingMode } from './components/WritingMode';
 import { useTodoStore } from './store/store';
 
 function App() {
-  const { loadTasks, loadLists, currentView, timerMode, darkMode, focusMode, writingMode } = useTodoStore();
+  const { loadTasks, loadLists, currentView, timerMode, darkMode } = useTodoStore();
 
   useEffect(() => {
     loadTasks();
@@ -29,19 +29,20 @@ function App() {
 
   return (
     <div className={`flex min-h-screen ${darkMode ? 'bg-dark-background text-dark-text' : 'bg-background text-text'} ${currentView === 'timer' ? getBackgroundColor() : ''} lg:pl-0`}>
-      {writingMode && <WritingMode />}
-      {!focusMode && !writingMode && <Sidebar />}
+      <Sidebar />
       <main className="flex-1 flex lg:ml-0">
-        <div className={`flex-1 ${focusMode || writingMode ? '' : 'lg:ml-64'} p-6`}>
+        <div className="flex-1 lg:ml-64 p-6">
           {currentView === 'timer' ? (
             <div className="max-w-2xl mx-auto pt-8">
               <PomodoroTimer />
             </div>
+          ) : currentView === 'writing' ? (
+            <WritingMode />
           ) : (
             <TaskList />
           )}
         </div>
-        {!focusMode && !writingMode && currentView === 'home' && (
+        {currentView === 'home' && (
           <aside className={`hidden lg:block w-80 p-6 border-l ${darkMode ? 'border-dark-border' : 'border-border'}`}>
             <StatsCard />
           </aside>

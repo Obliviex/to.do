@@ -6,15 +6,13 @@ interface TodoStore {
   tasks: Task[];
   lists: TaskList[];
   currentListId: number | null;
-  currentView: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy';
+  currentView: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy' | 'writing';
   searchQuery: string;
   sortBy: 'date' | 'name';
   streak: number;
   lastCompletedDate: Date | null;
   timerMode: 'pomodoro' | 'shortBreak' | 'longBreak';
   darkMode: boolean;
-  focusMode: boolean;
-  writingMode: boolean;
   
   loadTasks: () => Promise<void>;
   loadLists: () => Promise<void>;
@@ -25,13 +23,11 @@ interface TodoStore {
   addList: (name: string, color: string) => Promise<void>;
   deleteList: (id: number) => Promise<void>;
   setCurrentListId: (id: number | null) => void;
-  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy') => void;
+  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy' | 'writing') => void;
   setSearchQuery: (query: string) => void;
   setSortBy: (sort: 'date' | 'name') => void;
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => void;
   toggleDarkMode: () => void;
-  toggleFocusMode: () => void;
-  toggleWritingMode: () => void;
   calculateStreak: () => void;
 }
 
@@ -46,7 +42,6 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   lastCompletedDate: null,
   timerMode: 'pomodoro',
   darkMode: false,
-  focusMode: false,
   writingMode: false,
 
   loadTasks: async () => {
@@ -142,13 +137,11 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   },
 
   setCurrentListId: (id: number | null) => set({ currentListId: id }),
-  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy') => set({ currentView: view }),
+  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy' | 'writing') => set({ currentView: view }),
   setSearchQuery: (query: string) => set({ searchQuery: query }),
   setSortBy: (sort: 'date' | 'name') => set({ sortBy: sort }),
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => set({ timerMode: mode }),
   toggleDarkMode: () => set(state => ({ darkMode: !state.darkMode })),
-  toggleFocusMode: () => set(state => ({ focusMode: !state.focusMode })),
-  toggleWritingMode: () => set(state => ({ writingMode: !state.writingMode })),
 
   calculateStreak: () => {
     const { tasks, lastCompletedDate } = get();

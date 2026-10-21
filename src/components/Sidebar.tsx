@@ -10,10 +10,7 @@ export function Sidebar() {
     setCurrentView,
     streak,
     darkMode,
-    toggleDarkMode,
-    focusMode,
-    toggleFocusMode,
-    toggleWritingMode
+    toggleDarkMode
   } = useTodoStore();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -24,6 +21,7 @@ export function Sidebar() {
     { id: 'fun', label: 'Fun', icon: Sparkles },
     { id: 'wantToBuy', label: 'Want to Buy', icon: ShoppingCart },
     { id: 'completed', label: 'Completed', icon: CheckCircle2 },
+    { id: 'writing', label: 'Writing', icon: FileText },
   ];
 
   return (
@@ -90,26 +88,6 @@ export function Sidebar() {
 
       {/* Profile */}
       <div className={`border-t ${darkMode ? 'border-dark-border' : 'border-border'} pt-4 mt-4`}>
-        {/* Writing Mode */}
-        <button
-          onClick={toggleWritingMode}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-3 transition-colors ${darkMode ? 'text-dark-text-muted hover:bg-dark-background-dark hover:text-dark-text' : 'text-text-muted hover:bg-background hover:text-text'}`}
-        >
-          <FileText size={18} />
-          <span className="text-sm font-medium">Writing Mode</span>
-        </button>
-        
-        {/* Focus Mode Toggle */}
-        <button
-          onClick={toggleFocusMode}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg mb-3 transition-colors ${darkMode ? 'text-dark-text-muted hover:bg-dark-background-dark hover:text-dark-text' : 'text-text-muted hover:bg-background hover:text-text'}`}
-        >
-          <span className="text-sm font-medium">Focus Mode</span>
-          <div className={`w-12 h-6 rounded-full p-1 transition-colors ${focusMode ? 'bg-accent' : 'bg-gray-300'}`}>
-            <div className={`w-4 h-4 rounded-full bg-white transition-transform ${focusMode ? 'translate-x-6' : 'translate-x-0'}`} />
-          </div>
-        </button>
-        
         {/* Dark Mode Toggle */}
         <button
           onClick={toggleDarkMode}

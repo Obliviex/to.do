@@ -3,7 +3,7 @@ import { Copy, X } from 'lucide-react';
 import { useTodoStore } from '../store/store';
 
 export function WritingMode() {
-  const { darkMode, toggleFocusMode } = useTodoStore();
+  const { darkMode, setCurrentView } = useTodoStore();
   const [text, setText] = useState('');
   const [showControls, setShowControls] = useState(false);
   const [mouseTimeout, setMouseTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
@@ -18,12 +18,16 @@ export function WritingMode() {
     setMouseTimeout(timeout);
   };
 
+  const handleKeyDown = () => {
+    setShowControls(false);
+  };
+
   const handleCopy = () => {
     navigator.clipboard.writeText(text);
   };
 
   const handleClose = () => {
-    toggleFocusMode();
+    setCurrentView('home');
   };
 
   useEffect(() => {
@@ -45,19 +49,19 @@ export function WritingMode() {
     >
       {/* Top controls */}
       {showControls && (
-        <div className={`fixed top-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-2 rounded-lg ${darkMode ? 'bg-dark-card border-dark-border' : 'bg-card border-border'} border transition-opacity duration-300`}>
+        <div className={`fixed top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-lg ${darkMode ? 'bg-dark-card border-dark-border' : 'bg-card border-border'} border transition-opacity duration-300`}>
           <button
             onClick={handleCopy}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm ${darkMode ? 'text-dark-text hover:bg-dark-background-dark' : 'text-text hover:bg-background'} transition-colors`}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs ${darkMode ? 'text-dark-text hover:bg-dark-background-dark' : 'text-text hover:bg-background'} transition-colors`}
           >
-            <Copy size={16} />
+            <Copy size={14} />
             <span>Copy</span>
           </button>
           <button
             onClick={handleClose}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm ${darkMode ? 'text-dark-text hover:bg-dark-background-dark' : 'text-text hover:bg-background'} transition-colors`}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs ${darkMode ? 'text-dark-text hover:bg-dark-background-dark' : 'text-text hover:bg-background'} transition-colors`}
           >
-            <X size={16} />
+            <X size={14} />
             <span>Close</span>
           </button>
         </div>
@@ -69,6 +73,7 @@ export function WritingMode() {
           ref={textareaRef}
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Start writing..."
           className={`w-full max-w-4xl h-full resize-none text-lg leading-relaxed outline-none ${
             darkMode 
@@ -81,8 +86,8 @@ export function WritingMode() {
 
       {/* Bottom word count */}
       {showControls && (
-        <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg ${darkMode ? 'bg-dark-card border-dark-border' : 'bg-card border-border'} border transition-opacity duration-300`}>
-          <span className={`text-sm ${darkMode ? 'text-dark-text-muted' : 'text-text-muted'}`}>
+        <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg ${darkMode ? 'bg-dark-card border-dark-border' : 'bg-card border-border'} border transition-opacity duration-300`}>
+          <span className={`text-xs ${darkMode ? 'text-dark-text-muted' : 'text-text-muted'}`}>
             {wordCount} {wordCount === 1 ? 'word' : 'words'}
           </span>
         </div>
