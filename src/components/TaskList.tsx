@@ -21,6 +21,7 @@ export function TaskList() {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  const [editPriority, setEditPriority] = useState<'low' | 'medium' | 'high'>('medium');
   const [isFunTask, setIsFunTask] = useState(false);
   const [isWantToBuyTask, setIsWantToBuyTask] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
@@ -39,6 +40,16 @@ export function TaskList() {
       task.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
+      // Sort by priority first (high > medium > low)
+      const priorityOrder = { high: 0, medium: 1, low: 2 };
+      const aPriority = priorityOrder[a.priority || 'medium'];
+      const bPriority = priorityOrder[b.priority || 'medium'];
+      
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority;
+      }
+      
+      // Then sort by date or name
       if (sortBy === 'date') {
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       }
@@ -76,16 +87,18 @@ export function TaskList() {
   const handleEditStart = (task: any) => {
     setEditingId(task.id!);
     setEditTitle(task.title);
+    setEditPriority(task.priority || 'medium');
   };
 
   const handleEditSave = async (id: number) => {
-    await updateTask(id, { title: editTitle });
+    await updateTask(id, { title: editTitle, priority: editPriority });
     setEditingId(null);
   };
 
   const handleEditCancel = () => {
     setEditingId(null);
     setEditTitle('');
+    setEditPriority('medium');
   };
 
   return (
@@ -158,7 +171,7 @@ export function TaskList() {
                   <span className={`text-sm ${darkMode ? 'text-dark-text' : 'text-text'}`}>Want to Buy</span>
                 </label>
               )}
-              {currentView === 'home' && (
+              {(currentView === 'home' || currentView === 'fun' || currentView === 'wantToBuy') && (
                 <select
                   value={taskPriority}
                   onChange={(e) => setTaskPriority(e.target.value as 'low' | 'medium' | 'high')}
@@ -218,7 +231,7 @@ export function TaskList() {
 
 
               {editingId === task.id ? (
-                <div className="flex-1 flex gap-2">
+                <div className="flex-1 flex gap-2 items-center">
                   <input
                     type="text"
                     value={editTitle}
@@ -226,6 +239,15 @@ export function TaskList() {
                     className={`flex-1 px-3 py-2 ${darkMode ? 'bg-dark-background-dark border-dark-border text-dark-text' : 'bg-background border-border text-text'} rounded text-sm focus:outline-none focus:border-accent`}
                     autoFocus
                   />
+                  <select
+                    value={editPriority}
+                    onChange={(e) => setEditPriority(e.target.value as 'low' | 'medium' | 'high')}
+                    className={`px-2 py-2 ${darkMode ? 'bg-dark-background-dark border-dark-border text-dark-text' : 'bg-background border-border text-text'} rounded text-sm focus:outline-none focus:border-accent cursor-pointer`}
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
                   <button
                     onClick={() => handleEditSave(task.id!)}
                     className="p-2 text-accent hover:bg-accent/10 rounded transition-colors"
@@ -276,19 +298,57 @@ export function TaskList() {
                       {tasks.filter(t => t.parentTaskId === task.id).map((subcategory) => (
                         <div key={subcategory.id} className="ml-4 flex items-center gap-2">
                           <span className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>-</span>
-                          <span className={`text-sm ${subcategory.completed ? (darkMode ? 'line-through text-dark-text-muted' : 'line-through text-text-muted') : (darkMode ? 'text-dark-text' : 'text-text')}`}>
-                            {subcategory.title}
-                          </span>
-                          <button
-                            onClick={() => toggleTaskComplete(subcategory.id!)}
-                            className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
-                              subcategory.completed 
-                                ? 'bg-accent border-accent text-white' 
-                                : `${darkMode ? 'border-dark-border hover:border-accent' : 'border-border hover:border-accent'}`
-                            }`}
-                          >
-                            {subcategory.completed && <Check size={10} />}
-                          </button>
+                          {editingId === subcategory.id ? (
+                            <div className="flex-1 flex gap-2">
+                              <input
+                                type="text"
+                                value={editTitle}
+                                onChange={(e) => setEditTitle(e.target.value)}
+                                className={`flex-1 px-2 py-1 ${darkMode ? 'bg-dark-background-dark border-dark-border text-dark-text' : 'bg-background border-border text-text'} rounded text-xs focus:outline-none focus:border-accent`}
+                                autoFocus
+                              />
+                              <button
+                                onClick={() => handleEditSave(subcategory.id!)}
+                                className="p-1 text-accent hover:bg-accent/10 rounded transition-colors"
+                              >
+                                <Check size={14} />
+                              </button>
+                              <button
+                                onClick={handleEditCancel}
+                                className="p-1 text-text-muted hover:text-text hover:bg-background rounded transition-colors"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <span className={`text-sm ${subcategory.completed ? (darkMode ? 'line-through text-dark-text-muted' : 'line-through text-text-muted') : (darkMode ? 'text-dark-text' : 'text-text')}`}>
+                                {subcategory.title}
+                              </span>
+                              <button
+                                onClick={() => toggleTaskComplete(subcategory.id!)}
+                                className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                                  subcategory.completed 
+                                    ? 'bg-accent border-accent text-white' 
+                                    : `${darkMode ? 'border-dark-border hover:border-accent' : 'border-border hover:border-accent'}`
+                                }`}
+                              >
+                                {subcategory.completed && <Check size={10} />}
+                              </button>
+                              <button
+                                onClick={() => handleEditStart(subcategory)}
+                                className="p-1 text-text-muted hover:text-text hover:bg-background rounded transition-colors"
+                              >
+                                <Pencil size={12} />
+                              </button>
+                              <button
+                                onClick={() => deleteTask(subcategory.id!)}
+                                className="p-1 text-text-muted hover:text-red-500 hover:bg-background rounded transition-colors"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </>
+                          )}
                         </div>
                       ))}
                       {/* Inline add subcategory input */}
