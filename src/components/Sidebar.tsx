@@ -99,14 +99,10 @@ export function Sidebar() {
           </div>
         </button>
 
-        <div className="flex items-center gap-3 px-3">
-          <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-white font-bold text-sm">
-            U
-          </div>
-          <div>
-            <p className={`${darkMode ? 'text-dark-text' : 'text-text'} text-sm font-medium`}>User</p>
-            <p className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-xs`}>to.do</p>
-          </div>
+        <div className="flex items-center justify-center px-3">
+          <p className={`font-mono text-lg ${darkMode ? 'text-dark-text-muted' : 'text-text-muted'}`}>
+            to.do
+          </p>
         </div>
       </div>
     </aside>
