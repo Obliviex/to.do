@@ -42,12 +42,16 @@ export function TaskList() {
       task.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
-      // For schedule view, sort by creation order only
-      if (currentView === 'schedule') {
+      // Scheduled tasks come first, sorted by creation order
+      if (a.isScheduled && !b.isScheduled) return -1;
+      if (!a.isScheduled && b.isScheduled) return 1;
+      
+      // If both are scheduled, sort by creation order
+      if (a.isScheduled && b.isScheduled) {
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       }
       
-      // Sort by priority first (high > medium > low)
+      // For non-scheduled tasks, sort by priority first (high > medium > low)
       const priorityOrder = { high: 0, medium: 1, low: 2 };
       const aPriority = priorityOrder[a.priority || 'medium'];
       const bPriority = priorityOrder[b.priority || 'medium'];
