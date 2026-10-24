@@ -47,11 +47,16 @@ export function TaskList() {
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       }
       
-      // Scheduled tasks come first
+      // Scheduled tasks come first, sorted by creation order
       if (a.isScheduled && !b.isScheduled) return -1;
       if (!a.isScheduled && b.isScheduled) return 1;
       
-      // Sort by priority first (high > medium > low) for both scheduled and non-scheduled
+      // If both are scheduled, sort by creation order
+      if (a.isScheduled && b.isScheduled) {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+      
+      // For non-scheduled tasks, sort by priority first (high > medium > low)
       const priorityOrder = { high: 0, medium: 1, low: 2 };
       const aPriority = priorityOrder[a.priority || 'medium'];
       const bPriority = priorityOrder[b.priority || 'medium'];
