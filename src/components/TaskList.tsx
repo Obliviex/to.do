@@ -36,7 +36,7 @@ export function TaskList() {
       if (currentView === 'fun') return task.isFun && !task.completed;
       if (currentView === 'wantToBuy') return task.isWantToBuy && !task.completed;
       if (currentView === 'schedule') return task.isScheduled && !task.completed;
-      return !task.isFun && !task.isWantToBuy && !task.completed && !task.parentTaskId && !task.isScheduled;
+      return !task.isFun && !task.isWantToBuy && !task.completed && !task.parentTaskId;
     })
     .filter(task => 
       task.title.toLowerCase().includes(searchQuery.toLowerCase())
