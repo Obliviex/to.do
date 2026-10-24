@@ -101,9 +101,11 @@ export function Sidebar() {
         </button>
 
         <div className="flex items-center justify-center px-3">
-          <p className={`font-courier font-bold text-lg ${darkMode ? 'text-dark-text-muted' : 'text-text-muted'}`}>
-            to.do
-          </p>
+          <div className="bg-accent rounded-lg px-4 py-2">
+            <p className="font-courier font-bold text-lg text-white">
+              to.do
+            </p>
+          </div>
         </div>
       </div>
     </aside>
