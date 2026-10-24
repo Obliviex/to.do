@@ -6,7 +6,7 @@ interface TodoStore {
   tasks: Task[];
   lists: TaskList[];
   currentListId: number | null;
-  currentView: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy' | 'writing';
+  currentView: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy' | 'writing' | 'schedule';
   searchQuery: string;
   sortBy: 'date' | 'name';
   streak: number;
@@ -16,14 +16,14 @@ interface TodoStore {
   
   loadTasks: () => Promise<void>;
   loadLists: () => Promise<void>;
-  addTask: (title: string, listId: number, isFun?: boolean, isWantToBuy?: boolean, parentTaskId?: number, priority?: 'low' | 'medium' | 'high') => Promise<void>;
+  addTask: (title: string, listId: number, isFun?: boolean, isWantToBuy?: boolean, parentTaskId?: number, priority?: 'low' | 'medium' | 'high', isScheduled?: boolean, scheduledTime?: string) => Promise<void>;
   updateTask: (id: number, updates: Partial<Task>) => Promise<void>;
   deleteTask: (id: number) => Promise<void>;
   toggleTaskComplete: (id: number) => Promise<void>;
   addList: (name: string, color: string) => Promise<void>;
   deleteList: (id: number) => Promise<void>;
   setCurrentListId: (id: number | null) => void;
-  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy' | 'writing') => void;
+  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy' | 'writing' | 'schedule') => void;
   setSearchQuery: (query: string) => void;
   setSortBy: (sort: 'date' | 'name') => void;
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => void;
@@ -63,7 +63,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
     set({ lists });
   },
 
-  addTask: async (title: string, listId: number, isFun = false, isWantToBuy = false, parentTaskId?: number, priority?: 'low' | 'medium' | 'high') => {
+  addTask: async (title: string, listId: number, isFun = false, isWantToBuy = false, parentTaskId?: number, priority?: 'low' | 'medium' | 'high', isScheduled = false, scheduledTime?: string) => {
     const task = {
       title,
       completed: false,
@@ -72,7 +72,9 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
       isFun,
       isWantToBuy,
       parentTaskId,
-      priority: priority || 'medium'
+      priority: priority || 'medium',
+      isScheduled,
+      scheduledTime
     };
     const id = await db.tasks.add(task);
     set(state => ({ tasks: [...state.tasks, { ...task, id }] }));
@@ -137,7 +139,7 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
   },
 
   setCurrentListId: (id: number | null) => set({ currentListId: id }),
-  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy' | 'writing') => set({ currentView: view }),
+  setCurrentView: (view: 'timer' | 'home' | 'completed' | 'fun' | 'wantToBuy' | 'writing' | 'schedule') => set({ currentView: view }),
   setSearchQuery: (query: string) => set({ searchQuery: query }),
   setSortBy: (sort: 'date' | 'name') => set({ sortBy: sort }),
   setTimerMode: (mode: 'pomodoro' | 'shortBreak' | 'longBreak') => set({ timerMode: mode }),

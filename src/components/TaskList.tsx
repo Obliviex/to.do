@@ -28,18 +28,25 @@ export function TaskList() {
   const [subcategoryTitle, setSubcategoryTitle] = useState('');
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<number>>(new Set());
   const [taskPriority, setTaskPriority] = useState<'low' | 'medium' | 'high'>('medium');
+  const [taskTime, setTaskTime] = useState('');
 
   const filteredTasks = tasks
     .filter(task => {
       if (currentView === 'completed') return task.completed;
       if (currentView === 'fun') return task.isFun && !task.completed;
       if (currentView === 'wantToBuy') return task.isWantToBuy && !task.completed;
-      return !task.isFun && !task.isWantToBuy && !task.completed && !task.parentTaskId;
+      if (currentView === 'schedule') return task.isScheduled && !task.completed;
+      return !task.isFun && !task.isWantToBuy && !task.completed && !task.parentTaskId && !task.isScheduled;
     })
     .filter(task => 
       task.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
+      // For schedule view, sort by creation order only
+      if (currentView === 'schedule') {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+      
       // Sort by priority first (high > medium > low)
       const priorityOrder = { high: 0, medium: 1, low: 2 };
       const aPriority = priorityOrder[a.priority || 'medium'];
@@ -66,12 +73,15 @@ export function TaskList() {
       currentView === 'fun' ? true : isFunTask,
       currentView === 'wantToBuy' ? true : isWantToBuyTask,
       undefined,
-      taskPriority
+      taskPriority,
+      currentView === 'schedule' ? true : false,
+      taskTime || undefined
     );
     setNewTaskTitle('');
     setIsFunTask(false);
     setIsWantToBuyTask(false);
     setTaskPriority('medium');
+    setTaskTime('');
   };
 
   const handleAddSubcategory = async () => {
@@ -110,10 +120,26 @@ export function TaskList() {
           {currentView === 'fun' && 'Fun Tasks'}
           {currentView === 'wantToBuy' && 'Want to Buy'}
           {currentView === 'completed' && 'Completed'}
+          {currentView === 'schedule' && 'Schedule'}
         </h1>
-        <p className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>
-          {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>
+            {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
+          </p>
+          {currentView === 'schedule' && filteredTasks.length > 0 && (
+            <button
+              onClick={async () => {
+                const scheduledTasks = tasks.filter(t => t.isScheduled);
+                for (const task of scheduledTasks) {
+                  await deleteTask(task.id!);
+                }
+              }}
+              className="text-sm text-red-500 hover:text-red-600 transition-colors"
+            >
+              Clear Schedule
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Search and Sort */}
@@ -171,7 +197,7 @@ export function TaskList() {
                   <span className={`text-sm ${darkMode ? 'text-dark-text' : 'text-text'}`}>Want to Buy</span>
                 </label>
               )}
-              {(currentView === 'home' || currentView === 'fun' || currentView === 'wantToBuy') && (
+              {(currentView === 'home' || currentView === 'fun' || currentView === 'wantToBuy' || currentView === 'schedule') && (
                 <select
                   value={taskPriority}
                   onChange={(e) => setTaskPriority(e.target.value as 'low' | 'medium' | 'high')}
@@ -181,6 +207,14 @@ export function TaskList() {
                   <option value="medium">Medium</option>
                   <option value="high">High</option>
                 </select>
+              )}
+              {currentView === 'schedule' && (
+                <input
+                  type="time"
+                  value={taskTime}
+                  onChange={(e) => setTaskTime(e.target.value)}
+                  className={`px-4 py-3 ${darkMode ? 'bg-dark-card border-dark-border text-dark-text' : 'bg-card border-border text-text'} rounded-lg text-sm focus:outline-none focus:border-accent`}
+                />
               )}
               <button
                 type="submit"
@@ -199,7 +233,7 @@ export function TaskList() {
         {filteredTasks.length === 0 ? (
           <div className={`${darkMode ? 'bg-dark-card border-dark-border' : 'bg-card border-border'} rounded-card p-8 text-center`}>
             <p className={`${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} text-sm`}>
-              {currentView === 'completed' ? 'No completed tasks yet' : currentView === 'fun' ? 'No fun activities yet. Add one above!' : currentView === 'wantToBuy' ? 'No items to buy yet. Add one above!' : 'No tasks yet. Add one above!'}
+              {currentView === 'completed' ? 'No completed tasks yet' : currentView === 'fun' ? 'No fun activities yet. Add one above!' : currentView === 'wantToBuy' ? 'No items to buy yet. Add one above!' : currentView === 'schedule' ? 'No scheduled tasks yet. Add one above!' : 'No tasks yet. Add one above!'}
             </p>
           </div>
         ) : (
@@ -263,9 +297,16 @@ export function TaskList() {
                 </div>
               ) : (
                 <div className="flex-1">
-                  <span className={`text-sm block ${task.completed ? (darkMode ? 'line-through text-dark-text-muted' : 'line-through text-text-muted') : (darkMode ? 'text-dark-text' : 'text-text')}`}>
-                    {task.title}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm block ${task.completed ? (darkMode ? 'line-through text-dark-text-muted' : 'line-through text-text-muted') : (darkMode ? 'text-dark-text' : 'text-text')}`}>
+                      {task.title}
+                    </span>
+                    {task.scheduledTime && (
+                      <span className={`text-xs ${darkMode ? 'text-dark-text-muted' : 'text-text-muted'} font-mono`}>
+                        {task.scheduledTime}
+                      </span>
+                    )}
+                  </div>
                   
 
                   {/* Expand/Collapse button */}

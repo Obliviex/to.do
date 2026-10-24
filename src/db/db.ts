@@ -6,12 +6,14 @@ export interface Task {
   title: string;
   completed: boolean;
   listId: number;
-  createdAt: Date;
-  completedAt?: Date;
   isFun?: boolean;
   isWantToBuy?: boolean;
   parentTaskId?: number;
   priority?: 'low' | 'medium' | 'high';
+  isScheduled?: boolean;
+  scheduledTime?: string;
+  completedAt?: Date;
+  createdAt: Date;
 }
 
 export interface TaskList {
@@ -27,8 +29,8 @@ export class TodoDatabase extends Dexie {
 
   constructor() {
     super('TodoDatabase');
-    this.version(7).stores({
-      tasks: '++id, listId, completed, createdAt, completedAt, isFun, isWantToBuy, parentTaskId, priority',
+    this.version(8).stores({
+      tasks: '++id, listId, completed, createdAt, completedAt, isFun, isWantToBuy, parentTaskId, priority, isScheduled, scheduledTime',
       lists: '++id, name, createdAt'
     });
   }

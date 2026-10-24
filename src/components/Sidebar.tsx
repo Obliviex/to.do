@@ -1,4 +1,4 @@
-import { Home, Timer, CheckCircle2, Menu, X, Sparkles, ShoppingCart, Flame, FileText } from 'lucide-react';
+import { Home, Timer, CheckCircle2, Menu, X, Sparkles, ShoppingCart, Flame, FileText, Calendar } from 'lucide-react';
 import { useTodoStore } from '../store/store';
 import { useState } from 'react';
 
@@ -22,6 +22,7 @@ export function Sidebar() {
     { id: 'wantToBuy', label: 'Want to Buy', icon: ShoppingCart },
     { id: 'completed', label: 'Completed', icon: CheckCircle2 },
     { id: 'writing', label: 'Writing', icon: FileText },
+    { id: 'schedule', label: 'Schedule', icon: Calendar },
   ];
 
   return (
@@ -100,7 +101,7 @@ export function Sidebar() {
         </button>
 
         <div className="flex items-center justify-center px-3">
-          <p className={`font-mono text-lg ${darkMode ? 'text-dark-text-muted' : 'text-text-muted'}`}>
+          <p className={`font-courier font-bold text-lg ${darkMode ? 'text-dark-text-muted' : 'text-text-muted'}`}>
             to.do
           </p>
         </div>

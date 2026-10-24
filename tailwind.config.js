@@ -9,6 +9,7 @@ export default {
       fontFamily: {
         sans: ['"Lexend"', 'sans-serif'],
         mono: ['"JetBrains Mono"', '"IBM Plex Mono"', 'monospace'],
+        courier: ['"Courier Prime"', 'monospace'],
       },
       colors: {
         background: '#F5F0E6',
